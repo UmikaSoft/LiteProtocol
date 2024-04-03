@@ -3,7 +3,7 @@ import { Types } from "../src/baseTypes";
 import { randomAsciiStr, randomStr } from "./utils";
 
 function randomArray(length: number, f: () => any) {
-    const result = [];
+    const result: any[] = [];
     for (let i = 0; i < length; i++) {
         result.push(f());
     }

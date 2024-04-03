@@ -3,8 +3,6 @@ import { Types } from "../src/baseTypes";
 import { StructBuilder } from "../src/struct/structBuilder";
 import { randomAsciiStr, randomStr } from "./utils";
 
-
-
 test("Test serialization and deserialization of String types in BaseTypes", () => {
     let param_buffer;
     let str_buffer;

@@ -1,6 +1,6 @@
 {
     "name": "liteprotocol",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "main": "dist/index.js",
     "scripts": {
         "test": "jest",
@@ -28,4 +28,3 @@
         "typescript": "^5.4.3"
     }
 }
-
