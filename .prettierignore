@@ -1,0 +1,7 @@
+/node_modules/**/*
+.git
+pnpm-lock.yaml
+tsconfig.json
+
+# Github Actions 不可以修改 .github
+.github

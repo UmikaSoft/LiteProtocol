@@ -1,0 +1,31 @@
+{
+    "name": "liteprotocol",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "jest",
+        "build": "tsc"
+    },
+    "keywords": [],
+    "author": "XiYang6666",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/BetterKFD/LiteProtocol.git"
+    },
+    "bugs": {
+        "url": "https://github.com/BetterKFD/LiteProtocol/issues"
+    },
+    "homepage": "https://github.com/BetterKFD/LiteProtocol#readme",
+    "description": "Lightweight serialization and deserialization library written in TypeScript",
+    "devDependencies": {
+        "@types/jest": "^29.5.12",
+        "@types/node": "^20.11.30",
+        "jest": "^29.7.0",
+        "prettier": "^3.2.5",
+        "sequelize": "^6.37.2",
+        "ts-jest": "^29.1.2",
+        "typescript": "^5.4.3"
+    }
+}
+
