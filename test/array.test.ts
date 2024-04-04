@@ -36,6 +36,26 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     [newBigintArray, newLength] = type.read(buffer, 0);
     expect(bigintArray).toEqual(newBigintArray);
 
+    // TypedInt32Array
+    length = randomInt(0, 100);
+    let typedInt32Array = new Int32Array(randomArray(length, () => randomInt(-10000, 10000)));
+    let newTypedInt32Array;
+    type = Types.FLArray(Types.Int32, length);
+    buffer = type.write(typedInt32Array);
+    [newTypedInt32Array, newLength] = type.read(buffer, 0);
+    newTypedInt32Array = new Int32Array(newTypedInt32Array);
+    expect(typedInt32Array).toEqual(newTypedInt32Array);
+
+    // TypedInt64Array
+    length = randomInt(0, 100);
+    let typedInt64Array = new BigInt64Array(randomArray(length, () => BigInt(randomInt(-10000, 10000))));
+    let newTypedInt64Array;
+    type = Types.FLArray(Types.Int64, length);
+    buffer = type.write(typedInt64Array);
+    [newTypedInt64Array, newLength] = type.read(buffer, 0);
+    newTypedInt64Array = new BigInt64Array(newTypedInt64Array);
+    expect(typedInt64Array).toEqual(newTypedInt64Array);
+
     // FLStringArray
     length = randomInt(0, 100);
     let stringLength = randomInt(0, 1000);
