@@ -1,6 +1,7 @@
 import { createConnection } from "net";
 
 import { StructBuilder, Types } from "../src/";
+import { writeFileSync } from "fs";
 
 const enum State {
     HANDSHAKE = 0,
@@ -10,7 +11,7 @@ const enum State {
 
 const Handshake = StructBuilder.new()
     .rowVarInt32("protocol_version")
-    .rowPString("server_address", Types.UInt8)
+    .rowPString("server_address", Types.VarInt32)
     .rowUInt16("server_port")
     .rowVarInt32("next_status")
     .build<{
@@ -21,7 +22,9 @@ const Handshake = StructBuilder.new()
     }>();
 
 const StatusRequest = StructBuilder.new().build<{}>();
-const StatusResponse = StructBuilder.new().rowPString("json_response", Types.UInt16).build<{ json_response: string }>();
+const StatusResponse = StructBuilder.new()
+    .rowPString("json_response", Types.VarInt32)
+    .build<{ json_response: string }>();
 
 function createMcPacket(packet_id: number, data: Buffer): Buffer {
     let tempBuffer = Buffer.concat([Types.VarInt32.write(packet_id), data]);
