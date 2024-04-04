@@ -2,6 +2,8 @@ import assert from "assert";
 import { DataType } from "./dataType";
 import { FLStringLengthException } from "./exception/FLStringLengthException";
 import { FLArrayLengthException } from "./exception/FLArrayLengthException";
+import { VarIntTooLongException } from "./exception/varintTooLongException";
+import { UnsignedException } from "./exception/unsignedException";
 
 export namespace Types {
     // Int8
@@ -341,4 +343,64 @@ export namespace Types {
         PStringCache[encoding][len_type.symbol] = type;
         return type;
     }
+
+    export const VarInt32: DataType<number> = {
+        write: function (value: number): Buffer {
+            assert(value >= 0, new UnsignedException());
+            const buffer = Buffer.alloc(5);
+            let n = 0;
+            for (; value > 127; n++) {
+                buffer[n] = (value & 0x7f) | 0x80;
+                value = value >> 7;
+            }
+            buffer[n] = value & 0xff;
+            n++;
+            return buffer.subarray(0, n);
+        },
+        read: function (buffer: Buffer, offset: number): [number, number] {
+            let value = 0;
+            let bytesRead = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = buffer[offset + bytesRead];
+                bytesRead++;
+                value |= (byte & 0x7f) << shift;
+                shift += 7;
+                if (shift >= 32) throw new VarIntTooLongException();
+            } while (byte & 0x80);
+            return [value, bytesRead];
+        },
+        symbol: Symbol(),
+    };
+
+    export const VarInt64: DataType<bigint> = {
+        write: function (value: bigint): Buffer {
+            assert(value >= 0, new UnsignedException());
+            const buffer = Buffer.alloc(10);
+            let n = 0;
+            for (; value > 127; n++) {
+                buffer[n] = Number((value & 0x7fn) | 0x80n);
+                value = value >> 7n;
+            }
+            buffer[n] = Number(value & 0xffn);
+            n++;
+            return buffer.subarray(0, n);
+        },
+        read: function (buffer: Buffer, offset: number): [bigint, number] {
+            let value = 0n;
+            let bytesRead = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = buffer[offset + bytesRead];
+                bytesRead++;
+                value |= BigInt((byte & 0x7f) << shift);
+                shift += 7;
+                if (shift >= 64) throw new VarIntTooLongException();
+            } while (byte & 0x80);
+            return [value, bytesRead];
+        },
+        symbol: Symbol(),
+    };
 }
