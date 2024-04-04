@@ -28,7 +28,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     // FLString
 
-    struct = StructBuilder.new().varInt8("row_int8").varFLString("row_string", 10).varInt32("row_int32").build<{
+    struct = StructBuilder.new().rowInt8("row_int8").rowFLString("row_string", 10).rowInt32("row_int32").build<{
         row_int8: number;
         row_string: string;
         row_int32: number;
@@ -46,7 +46,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     // PString
 
-    struct = StructBuilder.new().varInt8("row_int8").varPString("row_string", Types.Int32).varInt32("row_int32").build<{
+    struct = StructBuilder.new().rowInt8("row_int8").rowPString("row_string", Types.Int32).rowInt32("row_int32").build<{
         row_int8: number;
         row_string: string;
         row_int32: number;
