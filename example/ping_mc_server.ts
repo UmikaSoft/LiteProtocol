@@ -61,8 +61,8 @@ const client = createConnection({ host, port }, () => {
             } else if (state == State.STATUS) {
                 if (id == 0) {
                     // Status Response
-                    const pack_info = StatusResponse.read(pack_data, 0);
-                    console.log({ state, id, pack_info });
+                    const [pack_info, pack_length] = StatusResponse.read(pack_data, 0);
+                    console.log({ state, id, pack_info, pack_length });
                 }
             } else if (state == State.LOGIN) {
                 // do something
