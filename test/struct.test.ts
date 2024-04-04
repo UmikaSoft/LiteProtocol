@@ -49,10 +49,10 @@ function getRandomData(): data {
         row_int32le: randomInt(-10000, 10000),
         row_uint32: randomInt(0, 10000),
         row_uint32le: randomInt(0, 10000),
-        row_int64: 1n,
-        row_int64le: 1n,
-        row_uint64: 1n,
-        row_uint64le: 1n,
+        row_int64: BigInt(randomInt(-10000, 10000)),
+        row_int64le: BigInt(randomInt(-10000, 10000)),
+        row_uint64: BigInt(randomInt(0, 10000)),
+        row_uint64le: BigInt(randomInt(0, 10000)),
         row_float: Math.random(),
         row_floatle: Math.random(),
         row_double: Math.random(),
@@ -67,9 +67,10 @@ test("Test serialization and deserialization of Struct objects with", () => {
 
     const data = getRandomData();
     const buffer = struct.write(data);
-    const [newData, offset] = struct.read(buffer, 0);
+    const offset = randomInt(0, 100);
+    const [newData, length] = struct.read(Buffer.concat([Buffer.alloc(offset), buffer]), offset);
 
-    expect(offset).toEqual(buffer.length);
+    expect(length).toEqual(buffer.length);
 
     for (let [key, value] of Object.entries(data)) // 逐一对比以防止序列化bigint报错以及float精准度问题
         if (typeof value === "number") expect(value).toBeCloseTo((newData as any)[key]);
@@ -97,6 +98,4 @@ test("Test StrutBuilder class to build struct objects", () => {
         .build<data>();
 
     expect(struct.getConf()).toEqual(config);
-
-    // Types.Array(Types.Int32)
 });
