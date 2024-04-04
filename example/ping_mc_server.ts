@@ -1,7 +1,5 @@
 import { createConnection } from "net";
-
 import { StructBuilder, Types } from "../src/";
-import { writeFileSync } from "fs";
 
 const enum State {
     HANDSHAKE = 0,
