@@ -2,7 +2,6 @@ import assert from "assert";
 import { DataType } from "./dataType";
 import { FLStringLengthException } from "./exception/FLStringLengthException";
 import { FLArrayLengthException } from "./exception/FLArrayLengthException";
-import { off } from "process";
 
 export namespace Types {
     // Int8
@@ -198,19 +197,22 @@ export namespace Types {
 
     const FLArrayCache: Record<symbol, Record<number, DataType<any>>> = {};
 
-    export function FLArray<T>(item_type: DataType<T>, length: number): DataType<T[]> {
+    export function FLArray<T>(item_type: DataType<T>, length: number): DataType<ArrayLike<T> & Iterable<T>>;
+
+    export function FLArray<T>(item_type: DataType<T>, length: number): DataType<ArrayLike<T> & Iterable<T>> {
         let cachedType;
         if (FLArrayCache[item_type.symbol] && (cachedType = FLArrayCache[item_type.symbol][length])) return cachedType;
 
-        const type: DataType<T[]> = {
-            write: function (value: T[]): Buffer {
+        const type: DataType<ArrayLike<T> & Iterable<T>> = {
+            write: function (value: ArrayLike<T> & Iterable<T>): Buffer {
                 const result = [];
+
                 if (value.length != length) throw new FLArrayLengthException(length, value.length);
                 for (let item of value) result.push(item_type.write(item));
                 return Buffer.concat(result);
             },
-            read: function (buffer: Buffer, offset: number): [T[], number] {
-                const result: T[] = [];
+            read: function (buffer: Buffer, offset: number): [ArrayLike<T> & Iterable<T>, number] {
+                const result = [];
                 let array_offset = 0;
                 for (let i = 0; i < length; i++) {
                     const [value, item_offset] = item_type.read(buffer, offset + array_offset);
@@ -230,20 +232,23 @@ export namespace Types {
 
     const PArrayCache: Record<symbol, Record<symbol, DataType<any>>> = {};
 
-    export function PArray<T>(item_type: DataType<T>, len_type: DataType<number | bigint>): DataType<T[]> {
+    export function PArray<T>(
+        item_type: DataType<T>,
+        len_type: DataType<number | bigint>,
+    ): DataType<ArrayLike<T> & Iterable<T>> {
         let cachedType;
         if (PArrayCache[item_type.symbol] && (cachedType = PArrayCache[item_type.symbol][len_type.symbol]))
             return cachedType;
 
-        const type: DataType<T[]> = {
-            write: function (value: T[]): Buffer {
+        const type: DataType<ArrayLike<T> & Iterable<T>> = {
+            write: function (value: ArrayLike<T> & Iterable<T>): Buffer {
                 let result = [len_type.write(value.length)];
                 for (let item of value) {
                     result.push(item_type.write(item));
                 }
                 return Buffer.concat(result);
             },
-            read: function (buffer: Buffer, offset: number): [T[], number] {
+            read: function (buffer: Buffer, offset: number): [ArrayLike<T> & Iterable<T>, number] {
                 const result = [];
                 let [length, array_offset] = len_type.read(buffer, offset);
                 for (let i = 0; i < length; i++) {
