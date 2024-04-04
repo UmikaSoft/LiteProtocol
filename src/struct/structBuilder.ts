@@ -32,6 +32,30 @@ export class StructBuilder {
         return this;
     }
 
+    // Int16
+
+    rowInt16(name: string) {
+        this.row(name, Types.Int16);
+        return this;
+    }
+
+    rowInt16LE(name: string) {
+        this.row(name, Types.Int16LE);
+        return this;
+    }
+
+    // UInt16
+
+    rowUInt16(name: string) {
+        this.row(name, Types.UInt16);
+        return this;
+    }
+
+    rowUInt16LE(name: string) {
+        this.row(name, Types.UInt16LE);
+        return this;
+    }
+
     // Int32
 
     rowInt32(name: string) {
@@ -127,6 +151,18 @@ export class StructBuilder {
 
     rowPString(name: string, len_type: DataType<number | bigint>, encoding?: BufferEncoding) {
         this.row(name, Types.PString(len_type, encoding));
+        return this;
+    }
+
+    //VarInt
+
+    rowVarInt32(name: string) {
+        this.row(name, Types.VarInt32);
+        return this;
+    }
+
+    rowVarInt64(name: string) {
+        this.row(name, Types.VarInt64);
         return this;
     }
 }

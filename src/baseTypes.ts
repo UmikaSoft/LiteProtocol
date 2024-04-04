@@ -35,6 +35,62 @@ export namespace Types {
         symbol: Symbol(),
     };
 
+    // Int16
+
+    export const Int16: DataType<number> = {
+        write: function (value: number): Buffer {
+            assert(Number.isInteger(value), new TypeError("Int16 type requires input of integer"));
+            const buffer = Buffer.alloc(2);
+            buffer.writeInt16BE(value);
+            return buffer;
+        },
+        read: function (buffer: Buffer, offset: number): [number, number] {
+            return [buffer.readInt16BE(offset), 2];
+        },
+        symbol: Symbol(),
+    };
+
+    export const Int16LE: DataType<number> = {
+        write: function (value: number): Buffer {
+            assert(Number.isInteger(value), new TypeError("Int16LE type requires input of integer"));
+            const buffer = Buffer.alloc(2);
+            buffer.writeInt16LE(value);
+            return buffer;
+        },
+        read: function (buffer: Buffer, offset: number): [number, number] {
+            return [buffer.readInt16LE(offset), 2];
+        },
+        symbol: Symbol(),
+    };
+
+    // UInt16
+
+    export const UInt16: DataType<number> = {
+        write: function (value: number): Buffer {
+            assert(Number.isInteger(value), new TypeError("UInt16 type requires input of integer"));
+            const buffer = Buffer.alloc(2);
+            buffer.writeUInt16BE(value);
+            return buffer;
+        },
+        read: function (buffer: Buffer, offset: number): [number, number] {
+            return [buffer.readUInt16BE(offset), 2];
+        },
+        symbol: Symbol(),
+    };
+
+    export const UInt16LE: DataType<number> = {
+        write: function (value: number): Buffer {
+            assert(Number.isInteger(value), new TypeError("UInt16LE type requires input of integer"));
+            const buffer = Buffer.alloc(2);
+            buffer.writeUInt16LE(value);
+            return buffer;
+        },
+        read: function (buffer: Buffer, offset: number): [number, number] {
+            return [buffer.readUInt16LE(offset), 2];
+        },
+        symbol: Symbol(),
+    };
+
     // Int32
 
     export const Int32: DataType<number> = {
@@ -343,6 +399,8 @@ export namespace Types {
         PStringCache[encoding][len_type.symbol] = type;
         return type;
     }
+
+    // VarInt
 
     export const VarInt32: DataType<number> = {
         write: function (value: number): Buffer {
