@@ -20,10 +20,10 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
         return Buffer.concat(result);
     }
     read(buffer: Buffer, offset: number): [T, number] {
-        let structOffset = offset;
+        let structOffset = 0;
         let result: T = {} as T;
         for (let { name, type } of this.config) {
-            let [value, rowOffset] = type.read(buffer, structOffset);
+            let [value, rowOffset] = type.read(buffer, offset + structOffset);
             (result as StructData)[name] = value;
             structOffset += rowOffset;
         }
