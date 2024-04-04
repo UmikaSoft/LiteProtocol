@@ -12,12 +12,12 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/BetterKFD/LiteProtocol.git"
+        "url": "git+https://github.com/UmikaSoft/LiteProtocol.git"
     },
     "bugs": {
-        "url": "https://github.com/BetterKFD/LiteProtocol/issues"
+        "url": "https://github.com/UmikaSoft/LiteProtocol/issues"
     },
-    "homepage": "https://github.com/BetterKFD/LiteProtocol#readme",
+    "homepage": "https://github.com/UmikaSoft/LiteProtocol#readme",
     "description": "Lightweight serialization and deserialization library written in TypeScript",
     "devDependencies": {
         "@types/jest": "^29.5.12",
