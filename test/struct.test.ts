@@ -30,6 +30,9 @@ const config = [
 
     { name: "row_flstring", type: Types.FLString(36) },
     { name: "row_pstring", type: Types.PString(Types.Int32) },
+
+    { name: "row_default_int8", type: Types.Int8, default: 114 },
+    { name: "row_default_uint8", type: Types.UInt8, default: 114 },
 ];
 
 type data = {
@@ -59,6 +62,9 @@ type data = {
 
     row_flstring: string;
     row_pstring: string;
+
+    row_default_int8?: number;
+    row_default_uint8?: number;
 };
 
 function getRandomData(): data {
@@ -102,11 +108,11 @@ test("Test serialization and deserialization of Struct objects", () => {
 
     expect(length).toEqual(buffer.length);
 
-    for (let [key, value] of Object.entries(data)) {
+    for (let [key, value] of Object.entries(newData)) {
         // 逐一对比以防止序列化bigint报错以及float精准度问题
         // console.log(key, value, (newData as any)[key]);
-        if (typeof value === "number") expect(value).toBeCloseTo((newData as any)[key]);
-        else expect(value).toEqual((newData as any)[key]);
+        if (typeof value === "number") expect(value).toBeCloseTo((data as any)[key] || 114);
+        else expect(value).toEqual((data as any)[key] || 114);
     }
 });
 
@@ -138,6 +144,9 @@ test("Test StrutBuilder class to build struct objects", () => {
 
         .rowFLString("row_flstring", 36)
         .rowPString("row_pstring", Types.Int32)
+
+        .rowInt8("row_default_int8", 114)
+        .rowUInt8("row_default_uint8", 114)
 
         .build<data>();
 

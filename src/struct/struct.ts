@@ -1,7 +1,6 @@
-import { config } from "process";
 import { DataType } from "../dataType";
 
-export type StructConf = Array<{ name: string; type: DataType<any> }>;
+export type StructConf = Array<{ name: string; type: DataType<any>; default?: any }>;
 export type StructData = { [row_name: string]: any };
 
 export class Struct<T extends StructData> implements DataType<StructData & T> {
@@ -14,8 +13,8 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
 
     write(value: T): Buffer {
         let result: Buffer[] = [];
-        for (let { name, type } of this.config) {
-            result.push(type.write(value[name]));
+        for (let { name, type, default: defaultValue } of this.config) {
+            result.push(type.write(value[name] || defaultValue));
         }
         return Buffer.concat(result);
     }
