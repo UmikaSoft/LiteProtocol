@@ -1,0 +1,12 @@
+/.github
+/.vscode
+/example
+/node_modules
+/src
+/test
+/.gitignore
+/.prettierignore
+/.prettierrc.cjs
+/jest.config.js
+/pnpm-lock.yaml
+/tsconfig.json
