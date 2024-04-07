@@ -4,418 +4,337 @@ import { FLStringLengthException } from "./exception/FLStringLengthException";
 import { FLArrayLengthException } from "./exception/FLArrayLengthException";
 import { VarIntTooLongException } from "./exception/varintTooLongException";
 import { UnsignedException } from "./exception/unsignedException";
+import { defineType, defineTypeGenerator } from "./defineType";
+import { buffer } from "stream/consumers";
 
 export namespace Types {
     // Int8
-    export const Int8: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Int8 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readInt8(offset), 1];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("Int8 type requires input of integer"));
             const buffer = Buffer.alloc(1);
             buffer.writeInt8(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readInt8(offset), 1];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // UInt8
 
-    export const UInt8: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const UInt8 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readUInt8(offset), 1];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("UInt8 type requires input of integer"));
             const buffer = Buffer.alloc(1);
             buffer.writeUInt8(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readUInt8(offset), 1];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // Int16
 
-    export const Int16: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Int16 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readInt16BE(offset), 2];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("Int16 type requires input of integer"));
             const buffer = Buffer.alloc(2);
             buffer.writeInt16BE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readInt16BE(offset), 2];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const Int16LE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Int16LE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readInt16LE(offset), 2];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("Int16LE type requires input of integer"));
             const buffer = Buffer.alloc(2);
             buffer.writeInt16LE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readInt16LE(offset), 2];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // UInt16
 
-    export const UInt16: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const UInt16 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readUInt16BE(offset), 2];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("UInt16 type requires input of integer"));
             const buffer = Buffer.alloc(2);
             buffer.writeUInt16BE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readUInt16BE(offset), 2];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const UInt16LE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const UInt16LE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readUInt16LE(offset), 2];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("UInt16LE type requires input of integer"));
             const buffer = Buffer.alloc(2);
             buffer.writeUInt16LE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readUInt16LE(offset), 2];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // Int32
 
-    export const Int32: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Int32 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readInt32BE(offset), 4];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("Int32 type requires input of integer"));
             const buffer = Buffer.alloc(4);
             buffer.writeInt32BE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readInt32BE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const Int32LE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Int32LE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readInt32LE(offset), 4];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("Int32LE type requires input of integer"));
             const buffer = Buffer.alloc(4);
             buffer.writeInt32LE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readInt32LE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // UInt32
 
-    export const UInt32: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const UInt32 = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readUInt32BE(offset), 4];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("UInt32 type requires input of integer"));
             const buffer = Buffer.alloc(4);
             buffer.writeUInt32BE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readUInt32BE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const UInt32LE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const UInt32LE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readUInt32LE(offset), 4];
+        },
+        (value) => {
             assert(Number.isInteger(value), new TypeError("UInt32LE type requires input of integer"));
             const buffer = Buffer.alloc(4);
             buffer.writeUInt32LE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readUInt32LE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // Int64
 
-    export const Int64: DataType<bigint> = {
-        write: function (value: bigint | number): Buffer {
+    export const Int64 = defineType<bigint>(
+        (buffer, offset) => {
+            return [buffer.readBigInt64BE(offset), 8];
+        },
+        // 兼容 PString / PArray 长度部分
+        (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
             buffer.writeBigInt64BE(BigInt(value));
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [bigint, number] {
-            return [buffer.readBigInt64BE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const Int64LE: DataType<bigint> = {
-        write: function (value: bigint | number): Buffer {
+    export const Int64LE = defineType<bigint>(
+        (buffer, offset) => {
+            return [buffer.readBigInt64LE(offset), 8];
+        },
+        (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
             buffer.writeBigInt64LE(BigInt(value));
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [bigint, number] {
-            return [buffer.readBigInt64LE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // UInt64
 
-    export const UInt64: DataType<bigint> = {
-        write: function (value: bigint | number): Buffer {
+    export const UInt64 = defineType<bigint>(
+        (buffer, offset) => {
+            return [buffer.readBigUInt64BE(offset), 8];
+        },
+        (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
             buffer.writeBigUInt64BE(BigInt(value));
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [bigint, number] {
-            return [buffer.readBigUInt64BE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const UInt64LE: DataType<bigint> = {
-        write: function (value: bigint | number): Buffer {
+    export const UInt64LE = defineType<bigint>(
+        (buffer, offset) => {
+            return [buffer.readBigUInt64LE(offset), 8];
+        },
+        (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
             buffer.writeBigUInt64LE(BigInt(value));
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [bigint, number] {
-            return [buffer.readBigUInt64LE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // Float
 
-    export const Float: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Float = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readFloatBE(offset), 4];
+        },
+        (value) => {
             const buffer = Buffer.alloc(4);
             buffer.writeFloatBE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readFloatBE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const FloatLE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const FloatLE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readFloatLE(offset), 4];
+        },
+        (value) => {
             const buffer = Buffer.alloc(4);
             buffer.writeFloatLE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readFloatLE(offset), 4];
-        },
-        symbol: Symbol(),
-    };
+    );
 
     // Double
 
-    export const Double: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const Double = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readDoubleBE(offset), 8];
+        },
+        (value) => {
             const buffer = Buffer.alloc(8);
             buffer.writeDoubleBE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readDoubleBE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
 
-    export const DoubleLE: DataType<number> = {
-        write: function (value: number): Buffer {
+    export const DoubleLE = defineType<number>(
+        (buffer, offset) => {
+            return [buffer.readDoubleLE(offset), 8];
+        },
+        (value) => {
             const buffer = Buffer.alloc(8);
             buffer.writeDoubleLE(value);
             return buffer;
         },
-        read: function (buffer: Buffer, offset: number): [number, number] {
-            return [buffer.readDoubleLE(offset), 8];
-        },
-        symbol: Symbol(),
-    };
+    );
+
+    //Array
+
+    type UniversalArray<T> = ArrayLike<T> & Iterable<T>;
 
     // FLArray
 
-    const FLArrayCache: Record<symbol, Record<number, DataType<any>>> = {};
+    const FLArrayGenerator = defineTypeGenerator<{ item_type: DataType<any>; length: number }, UniversalArray<any>>(
+        ({ item_type, length }, buffer, offset) => {
+            const result: any[] = [];
+            let array_offset = 0;
+            for (let i = 0; i < length; i++) {
+                const [value, item_offset] = item_type.read(buffer, offset + array_offset);
+                array_offset += item_offset;
+                result.push(value);
+            }
+            return [result, array_offset];
+        },
+        ({ item_type, length }, value) => {
+            const result = [];
+            if (value.length != length) throw new FLArrayLengthException(length, value.length);
+            for (let item of value) result.push(item_type.write(item));
+            return Buffer.concat(result);
+        },
+    );
 
-    export function FLArray<T>(item_type: DataType<T>, length: number): DataType<ArrayLike<T> & Iterable<T>>;
-
-    export function FLArray<T>(item_type: DataType<T>, length: number): DataType<ArrayLike<T> & Iterable<T>> {
-        let cachedType;
-        if (FLArrayCache[item_type.symbol] && (cachedType = FLArrayCache[item_type.symbol][length])) return cachedType;
-
-        const type: DataType<ArrayLike<T> & Iterable<T>> = {
-            write: function (value: ArrayLike<T> & Iterable<T>): Buffer {
-                const result = [];
-
-                if (value.length != length) throw new FLArrayLengthException(length, value.length);
-                for (let item of value) result.push(item_type.write(item));
-                return Buffer.concat(result);
-            },
-            read: function (buffer: Buffer, offset: number): [ArrayLike<T> & Iterable<T>, number] {
-                const result = [];
-                let array_offset = 0;
-                for (let i = 0; i < length; i++) {
-                    const [value, item_offset] = item_type.read(buffer, offset + array_offset);
-                    array_offset += item_offset;
-                    result.push(value);
-                }
-                return [result, array_offset];
-            },
-            symbol: Symbol(),
-        };
-        if (!FLArrayCache[item_type.symbol]) FLArrayCache[item_type.symbol] = {};
-        FLArrayCache[item_type.symbol][length] = type;
-        return type;
+    export function FLArray<T>(param: { item_type: DataType<T>; length: number }): DataType<UniversalArray<T>> {
+        return FLArrayGenerator(param);
     }
 
     // PArray
 
-    const PArrayCache: Record<symbol, Record<symbol, DataType<any>>> = {};
+    const PArrayGenerator = defineTypeGenerator<
+        { item_type: DataType<any>; len_type: DataType<number | bigint> },
+        UniversalArray<any>
+    >(
+        ({ item_type, len_type }, buffer, offset) => {
+            const result: any[] = [];
+            let [length, array_offset] = len_type.read(buffer, offset);
+            for (let i = 0; i < length; i++) {
+                const [value, item_offset] = item_type.read(buffer, offset + array_offset);
+                array_offset += item_offset;
+                result.push(value);
+            }
+            return [result, array_offset];
+        },
+        ({ item_type, len_type }, value) => {
+            let result = [len_type.write(value.length)];
+            for (let item of value) {
+                result.push(item_type.write(item));
+            }
+            return Buffer.concat(result);
+        },
+    );
 
-    export function PArray<T>(
-        item_type: DataType<T>,
-        len_type: DataType<number | bigint>,
-    ): DataType<ArrayLike<T> & Iterable<T>> {
-        let cachedType;
-        if (PArrayCache[item_type.symbol] && (cachedType = PArrayCache[item_type.symbol][len_type.symbol]))
-            return cachedType;
-
-        const type: DataType<ArrayLike<T> & Iterable<T>> = {
-            write: function (value: ArrayLike<T> & Iterable<T>): Buffer {
-                let result = [len_type.write(value.length)];
-                for (let item of value) {
-                    result.push(item_type.write(item));
-                }
-                return Buffer.concat(result);
-            },
-            read: function (buffer: Buffer, offset: number): [ArrayLike<T> & Iterable<T>, number] {
-                const result = [];
-                let [length, array_offset] = len_type.read(buffer, offset);
-                for (let i = 0; i < length; i++) {
-                    const [value, item_offset] = item_type.read(buffer, offset + array_offset);
-                    array_offset += item_offset;
-                    result.push(value);
-                }
-                return [result, array_offset];
-            },
-            symbol: Symbol(),
-        };
-        if (!PArrayCache[item_type.symbol]) PArrayCache[item_type.symbol] = {};
-        PArrayCache[item_type.symbol][len_type.symbol] = type;
-        return type;
+    export function PArray<T>(param: {
+        item_type: DataType<T>;
+        len_type: DataType<number | bigint>;
+    }): DataType<UniversalArray<T>> {
+        return PArrayGenerator(param);
     }
 
     // FLString
 
-    const FLStringCache: Record<BufferEncoding, Record<number, DataType<string>>> = {
-        ascii: {},
-        utf8: {},
-        "utf-8": {},
-        utf16le: {},
-        "utf-16le": {},
-        ucs2: {},
-        "ucs-2": {},
-        base64: {},
-        base64url: {},
-        latin1: {},
-        binary: {},
-        hex: {},
-    };
-
-    export function FLString(length: number, encoding: BufferEncoding = "utf8"): DataType<string> {
-        let cachedType;
-        if ((cachedType = FLStringCache[encoding][length])) return cachedType;
-
-        const type: DataType<string> = {
-            write: function (value: string): Buffer {
-                const strBuffer = Buffer.from(value, encoding);
-                if (strBuffer.length != length) throw new FLStringLengthException(length, strBuffer.length);
-                const buffer = Buffer.alloc(length);
-                buffer.write(value);
-                return buffer;
-            },
-            read: function (buffer: Buffer, offset: number): [string, number] {
-                return [buffer.subarray(offset, offset + length).toString(encoding), length];
-            },
-            symbol: Symbol(),
-        };
-        FLStringCache[encoding][length] = type;
-        return type;
-    }
+    export const FLString = defineTypeGenerator<{ length: number; encoding: BufferEncoding }, string>(
+        ({ length, encoding }, buffer, offset) => {
+            return [buffer.subarray(offset, offset + length).toString(encoding), length];
+        },
+        ({ length, encoding }, value) => {
+            const strBuffer = Buffer.from(value, encoding);
+            if (strBuffer.length != length) throw new FLStringLengthException(length, strBuffer.length);
+            const buffer = Buffer.alloc(length);
+            buffer.write(value);
+            return buffer;
+        },
+    );
 
     // PString
 
-    const PStringCache: Record<BufferEncoding, Record<symbol, DataType<string>>> = {
-        ascii: {},
-        utf8: {},
-        "utf-8": {},
-        utf16le: {},
-        "utf-16le": {},
-        ucs2: {},
-        "ucs-2": {},
-        base64: {},
-        base64url: {},
-        latin1: {},
-        binary: {},
-        hex: {},
-    };
-
-    export function PString(len_type: DataType<number | bigint>, encoding: BufferEncoding = "utf8") {
-        let cachedType;
-        if ((cachedType = PStringCache[encoding][len_type.symbol])) return cachedType;
-
-        const type: DataType<string> = {
-            write: function (value: string): Buffer {
-                const buffer = Buffer.from(value, encoding);
-                return Buffer.concat([len_type.write(buffer.length), buffer]);
-            },
-            read: function (buffer: Buffer, offset: number): [string, number] {
-                const [length, len_offset] = len_type.read(buffer, offset);
-                return [
-                    buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
-                    len_offset + Number(length),
-                ];
-            },
-            symbol: Symbol(),
-        };
-        PStringCache[encoding][len_type.symbol] = type;
-        return type;
-    }
+    export const PString = defineTypeGenerator<
+        { len_type: DataType<number | bigint>; encoding: BufferEncoding },
+        string
+    >(
+        ({ len_type, encoding }, buffer, offset) => {
+            const [length, len_offset] = len_type.read(buffer, offset);
+            return [
+                buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
+                len_offset + Number(length),
+            ];
+        },
+        ({ len_type, encoding }, value) => {
+            const buffer = Buffer.from(value, encoding);
+            return Buffer.concat([len_type.write(buffer.length), buffer]);
+        },
+    );
 
     // VarInt
 
-    export const VarInt32: DataType<number> = {
-        write: function (value: number): Buffer {
-            assert(value >= 0, new UnsignedException());
-            const buffer = Buffer.alloc(5);
-            let n = 0;
-            for (; value > 127; n++) {
-                buffer[n] = (value & 0x7f) | 0x80;
-                value = value >> 7;
-            }
-            buffer[n] = value & 0xff;
-            n++;
-            return buffer.subarray(0, n);
-        },
-        read: function (buffer: Buffer, offset: number): [number, number] {
+    export const VarInt32 = defineType<number>(
+        (buffer, offset) => {
             let value = 0;
             let bytesRead = 0;
             let shift = 0;
@@ -429,23 +348,22 @@ export namespace Types {
             } while (byte & 0x80);
             return [value, bytesRead];
         },
-        symbol: Symbol(),
-    };
-
-    export const VarInt64: DataType<bigint> = {
-        write: function (value: bigint): Buffer {
+        (value) => {
             assert(value >= 0, new UnsignedException());
-            const buffer = Buffer.alloc(10);
+            const buffer = Buffer.alloc(5);
             let n = 0;
             for (; value > 127; n++) {
-                buffer[n] = Number((value & 0x7fn) | 0x80n);
-                value = value >> 7n;
+                buffer[n] = (value & 0x7f) | 0x80;
+                value = value >> 7;
             }
-            buffer[n] = Number(value & 0xffn);
+            buffer[n] = value & 0xff;
             n++;
             return buffer.subarray(0, n);
         },
-        read: function (buffer: Buffer, offset: number): [bigint, number] {
+    );
+
+    export const VarInt64 = defineType<bigint>(
+        (buffer, offset) => {
             let value = 0n;
             let bytesRead = 0;
             let shift = 0;
@@ -459,6 +377,17 @@ export namespace Types {
             } while (byte & 0x80);
             return [value, bytesRead];
         },
-        symbol: Symbol(),
-    };
+        (value) => {
+            assert(value >= 0, new UnsignedException());
+            const buffer = Buffer.alloc(10);
+            let n = 0;
+            for (; value > 127; n++) {
+                buffer[n] = Number((value & 0x7fn) | 0x80n);
+                value = value >> 7n;
+            }
+            buffer[n] = Number(value & 0xffn);
+            n++;
+            return buffer.subarray(0, n);
+        },
+    );
 }
