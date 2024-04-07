@@ -242,8 +242,8 @@ export namespace Types {
 
     // FLArray
 
-    const FLArrayGenerator = defineTypeGenerator<{ item_type: DataType<any>; length: number }, UniversalArray<any>>(
-        ({ item_type, length }, buffer, offset) => {
+    const FLArrayGenerator = defineTypeGenerator<[DataType<any>, number], UniversalArray<any>>(
+        (buffer, offset, item_type, length) => {
             const result: any[] = [];
             let array_offset = 0;
             for (let i = 0; i < length; i++) {
@@ -253,7 +253,7 @@ export namespace Types {
             }
             return [result, array_offset];
         },
-        ({ item_type, length }, value) => {
+        (value, item_type, length) => {
             const result = [];
             if (value.length != length) throw new FLArrayLengthException(length, value.length);
             for (let item of value) result.push(item_type.write(item));
@@ -261,17 +261,14 @@ export namespace Types {
         },
     );
 
-    export function FLArray<T>(param: { item_type: DataType<T>; length: number }): DataType<UniversalArray<T>> {
-        return FLArrayGenerator(param);
+    export function FLArray<T>(...param: [DataType<T>, number]): DataType<UniversalArray<T>> {
+        return FLArrayGenerator(...param);
     }
 
     // PArray
 
-    const PArrayGenerator = defineTypeGenerator<
-        { item_type: DataType<any>; len_type: DataType<number | bigint> },
-        UniversalArray<any>
-    >(
-        ({ item_type, len_type }, buffer, offset) => {
+    const PArrayGenerator = defineTypeGenerator<[DataType<any>, DataType<number | bigint>], UniversalArray<any>>(
+        (buffer, offset, item_type, len_type) => {
             const result: any[] = [];
             let [length, array_offset] = len_type.read(buffer, offset);
             for (let i = 0; i < length; i++) {
@@ -281,7 +278,7 @@ export namespace Types {
             }
             return [result, array_offset];
         },
-        ({ item_type, len_type }, value) => {
+        (value, item_type, len_type) => {
             let result = [len_type.write(value.length)];
             for (let item of value) {
                 result.push(item_type.write(item));
@@ -290,20 +287,17 @@ export namespace Types {
         },
     );
 
-    export function PArray<T>(param: {
-        item_type: DataType<T>;
-        len_type: DataType<number | bigint>;
-    }): DataType<UniversalArray<T>> {
-        return PArrayGenerator(param);
+    export function PArray<T>(...param: [DataType<T>, DataType<number | bigint>]): DataType<UniversalArray<T>> {
+        return PArrayGenerator(...param);
     }
 
     // FLString
 
-    export const FLString = defineTypeGenerator<{ length: number; encoding: BufferEncoding }, string>(
-        ({ length, encoding }, buffer, offset) => {
+    export const FLString = defineTypeGenerator<[number, BufferEncoding?], string>(
+        (buffer, offset, length, encoding) => {
             return [buffer.subarray(offset, offset + length).toString(encoding), length];
         },
-        ({ length, encoding }, value) => {
+        (value, length, encoding) => {
             const strBuffer = Buffer.from(value, encoding);
             if (strBuffer.length != length) throw new FLStringLengthException(length, strBuffer.length);
             const buffer = Buffer.alloc(length);
@@ -314,18 +308,15 @@ export namespace Types {
 
     // PString
 
-    export const PString = defineTypeGenerator<
-        { len_type: DataType<number | bigint>; encoding: BufferEncoding },
-        string
-    >(
-        ({ len_type, encoding }, buffer, offset) => {
+    export const PString = defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
+        (buffer, offset, len_type, encoding) => {
             const [length, len_offset] = len_type.read(buffer, offset);
             return [
                 buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
                 len_offset + Number(length),
             ];
         },
-        ({ len_type, encoding }, value) => {
+        (value, len_type, encoding) => {
             const buffer = Buffer.from(value, encoding);
             return Buffer.concat([len_type.write(buffer.length), buffer]);
         },

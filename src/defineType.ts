@@ -12,20 +12,25 @@ export function defineType<T>(read_func: ReadFunc<T>, write_func: WriteFunc<T>):
     return type;
 }
 
-type TypeGenerator<C, T> = (param: C) => DataType<T>;
+type TypeGenerator<C extends any[], T> = (...param: C) => DataType<T>;
 
-export function defineTypeGenerator<C, T>(
-    read_func: (param: C, buffer: Buffer, offset: number) => [T, number],
-    write_func: (param: C, value: T) => Buffer,
+export function defineTypeGenerator<C extends any[], T>(
+    read_func: (buffer: Buffer, offset: number, ...param: C) => [T, number],
+    write_func: (value: T, ...param: C) => Buffer,
 ): TypeGenerator<C, T> {
-    return (param: C) => {
-        const cache = new Map<C, DataType<T>>();
+    const cache = new Map<C, DataType<T>>();
+    return (...param: C) => {
         let type = cache.get(param);
-        return type
-            ? type
-            : defineType<T>(
-                  (buffer, offset) => read_func(param, buffer, offset),
-                  (value) => write_func(param, value),
-              );
+        console.log(cache, param, type);
+        if (type) return type;
+        else {
+            type = defineType<T>(
+                (buffer, offset) => read_func(buffer, offset, ...param),
+                (value) => write_func(value, ...param),
+            );
+            cache.set(param, type);
+            console.log(cache, param, type);
+            return type;
+        }
     };
 }
