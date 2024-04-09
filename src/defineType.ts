@@ -6,7 +6,6 @@ export type WriteFunc<T> = (value: T) => Buffer;
 
 export function defineType<T>(read_func: ReadFunc<T>, write_func: WriteFunc<T>): DataType<T> {
     const type: DataType<T> = {
-        symbol: Symbol(),
         read: read_func,
         write: write_func,
     };
