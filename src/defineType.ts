@@ -1,4 +1,5 @@
 import { DataType } from "./dataType";
+import { CacheTree } from "./utils";
 
 type ReadFunc<T> = (buffer: Buffer, offset: number) => [T, number];
 type WriteFunc<T> = (value: T) => Buffer;
@@ -18,18 +19,23 @@ export function defineTypeGenerator<C extends any[], T>(
     read_func: (buffer: Buffer, offset: number, ...param: C) => [T, number],
     write_func: (value: T, ...param: C) => Buffer,
 ): TypeGenerator<C, T> {
-    const cache = new Map<C, DataType<T>>();
+    const cache = new CacheTree();
     return (...param: C) => {
-        let type = cache.get(param);
-        console.log(cache, param, type);
+        const reversedParam = [...param].reverse();
+        let fixedParam: C = [] as unknown as C;
+        for (let [index, value] of reversedParam.entries()) {
+            if (value === undefined) continue;
+            fixedParam = param.slice(0, reversedParam.length - index) as C;
+            break;
+        }
+        let type = cache.getValue(fixedParam);
         if (type) return type;
         else {
             type = defineType<T>(
-                (buffer, offset) => read_func(buffer, offset, ...param),
-                (value) => write_func(value, ...param),
+                (buffer, offset) => read_func(buffer, offset, ...fixedParam),
+                (value) => write_func(value, ...fixedParam),
             );
-            cache.set(param, type);
-            console.log(cache, param, type);
+            cache.setValue(fixedParam, type);
             return type;
         }
     };
