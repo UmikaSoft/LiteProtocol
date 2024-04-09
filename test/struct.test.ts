@@ -142,8 +142,8 @@ test("Test StrutBuilder class to build struct objects", () => {
         .rowDouble("row_double")
         .rowDoubleLE("row_doublele")
 
-        .rowFLString("row_flstring", 36)
-        .rowPString("row_pstring", BaseTypes.Int32)
+        .rowFLString("row_flstring")(36)
+        .rowPString("row_pstring")(BaseTypes.Int32)
 
         .rowInt8("row_default_int8", 114)
         .rowUInt8("row_default_uint8", 114)

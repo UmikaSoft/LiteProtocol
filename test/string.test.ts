@@ -52,7 +52,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     // FLString
 
-    struct = StructBuilder.new().rowInt8("row_int8").rowFLString("row_string", 10).rowInt32("row_int32").build<{
+    struct = StructBuilder.new().rowInt8("row_int8").rowFLString("row_string")(10).rowInt32("row_int32").build<{
         row_int8: number;
         row_string: string;
         row_int32: number;
@@ -71,11 +71,15 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     // PString
 
-    struct = StructBuilder.new().rowInt8("row_int8").rowPString("row_string", BaseTypes.Int32).rowInt32("row_int32").build<{
-        row_int8: number;
-        row_string: string;
-        row_int32: number;
-    }>();
+    struct = StructBuilder.new()
+        .rowInt8("row_int8")
+        .rowPString("row_string")(BaseTypes.Int32)
+        .rowInt32("row_int32")
+        .build<{
+            row_int8: number;
+            row_string: string;
+            row_int32: number;
+        }>();
     data = {
         row_int8: randomInt(-128, 127),
         row_string: randomStr(randomInt(0, 10000)),

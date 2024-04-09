@@ -1,5 +1,6 @@
 import { BaseTypes } from "../baseTypes";
 import { DataType } from "../dataType";
+import { TypeGenerator } from "../defineType";
 import { Struct, StructConf, StructData } from "./struct";
 
 export class StructBuilder {
@@ -16,6 +17,12 @@ export class StructBuilder {
     row<T>(name: string, type: DataType<T>, default_value?: T) {
         this.structConf.push({ name, type, ...(default_value === undefined ? null : { default: default_value }) });
         return this;
+    }
+    generatorRow<C extends any[], T>(name: string, generator: TypeGenerator<C, T>, default_value?: T) {
+        return (...param: C) => {
+            this.row(name, generator(...param), default_value);
+            return this;
+        };
     }
 
     // Int8
@@ -130,33 +137,35 @@ export class StructBuilder {
 
     //FLArray
 
-    rowFLArray<T>(name: string, item_type: DataType<T>, length: number, default_value?: ArrayLike<T> & Iterable<T>) {
-        this.row(name, BaseTypes.FLArray(item_type, length), default_value);
+    rowFLArray<T>(
+        name: string,
+        default_value?: ArrayLike<T> & Iterable<T>,
+    ): (item_type: DataType<T>, length: number) => this {
+        return this.generatorRow(name, BaseTypes.FLArray, default_value);
     }
 
     //PArray
 
     rowPArray<T>(
         name: string,
-        item_type: DataType<T>,
-        len_type: DataType<number | bigint>,
         default_value?: ArrayLike<T> & Iterable<T>,
-    ) {
-        this.row(name, BaseTypes.PArray(item_type, len_type), default_value);
+    ): (item_type: DataType<T>, len_type: DataType<number | bigint>) => this {
+        return this.generatorRow(name, BaseTypes.PArray, default_value);
     }
 
     //FLString
 
-    rowFLString(name: string, length: number, encoding?: BufferEncoding, default_value?: string) {
-        this.row(name, BaseTypes.FLString(length, encoding), default_value);
-        return this;
+    rowFLString(name: string, default_value?: string): (length: number, encoding?: BufferEncoding) => this {
+        return this.generatorRow(name, BaseTypes.FLString, default_value);
     }
 
     // PString
 
-    rowPString(name: string, len_type: DataType<number | bigint>, encoding?: BufferEncoding, default_value?: string) {
-        this.row(name, BaseTypes.PString(len_type, encoding), default_value);
-        return this;
+    rowPString(
+        name: string,
+        default_value?: string,
+    ): (len_type: DataType<number | bigint>, encoding?: BufferEncoding) => this {
+        return this.generatorRow(name, BaseTypes.PString, default_value);
     }
 
     //VarInt
