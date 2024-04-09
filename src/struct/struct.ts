@@ -4,7 +4,6 @@ export type StructConf = Array<{ name: string; type: DataType<any>; default?: an
 export type StructData = { [row_name: string]: any };
 
 export class Struct<T extends StructData> implements DataType<StructData & T> {
-    symbol: symbol = Symbol();
     protected config: StructConf;
 
     constructor(config: StructConf) {
