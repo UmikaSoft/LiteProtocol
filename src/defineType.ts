@@ -1,8 +1,8 @@
 import { DataType } from "./dataType";
 import { CacheTree } from "./utils";
 
-type ReadFunc<T> = (buffer: Buffer, offset: number) => [T, number];
-type WriteFunc<T> = (value: T) => Buffer;
+export type ReadFunc<T> = (buffer: Buffer, offset: number) => [T, number];
+export type WriteFunc<T> = (value: T) => Buffer;
 
 export function defineType<T>(read_func: ReadFunc<T>, write_func: WriteFunc<T>): DataType<T> {
     const type: DataType<T> = {
@@ -13,7 +13,7 @@ export function defineType<T>(read_func: ReadFunc<T>, write_func: WriteFunc<T>):
     return type;
 }
 
-type TypeGenerator<C extends any[], T> = (...param: C) => DataType<T>;
+export type TypeGenerator<C extends any[], T> = (...param: C) => DataType<T>;
 
 export function defineTypeGenerator<C extends any[], T>(
     read_func: (buffer: Buffer, offset: number, ...param: C) => [T, number],

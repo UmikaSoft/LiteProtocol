@@ -1,5 +1,5 @@
 import { randomInt } from "crypto";
-import { Types } from "../src/baseTypes";
+import { BaseTypes } from "../src/baseTypes";
 import { randomAsciiStr, randomStr } from "./utils";
 
 function randomArray(length: number, f: () => any) {
@@ -20,7 +20,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     length = randomInt(0, 100);
     let numberArray: number[] = randomArray(length, () => randomInt(-10000, 10000));
     let newNumberArray;
-    type = Types.FLArray(Types.Int32, length);
+    type = BaseTypes.FLArray(BaseTypes.Int32, length);
     buffer = type.write(numberArray);
     // console.log(buffer);
     [newNumberArray, newLength] = type.read(buffer, 0);
@@ -30,7 +30,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     length = randomInt(0, 100);
     let bigintArray: bigint[] = randomArray(length, () => BigInt(randomInt(-10000, 10000)));
     let newBigintArray;
-    type = Types.FLArray(Types.Int64, length);
+    type = BaseTypes.FLArray(BaseTypes.Int64, length);
     buffer = type.write(bigintArray);
     // console.log(buffer);
     [newBigintArray, newLength] = type.read(buffer, 0);
@@ -40,7 +40,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     length = randomInt(0, 100);
     let typedInt32Array = new Int32Array(randomArray(length, () => randomInt(-10000, 10000)));
     let newTypedInt32Array;
-    type = Types.FLArray(Types.Int32, length);
+    type = BaseTypes.FLArray(BaseTypes.Int32, length);
     buffer = type.write(typedInt32Array);
     [newTypedInt32Array, newLength] = type.read(buffer, 0);
     newTypedInt32Array = new Int32Array(newTypedInt32Array);
@@ -50,7 +50,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     length = randomInt(0, 100);
     let typedInt64Array = new BigInt64Array(randomArray(length, () => BigInt(randomInt(-10000, 10000))));
     let newTypedInt64Array;
-    type = Types.FLArray(Types.Int64, length);
+    type = BaseTypes.FLArray(BaseTypes.Int64, length);
     buffer = type.write(typedInt64Array);
     [newTypedInt64Array, newLength] = type.read(buffer, 0);
     newTypedInt64Array = new BigInt64Array(newTypedInt64Array);
@@ -61,7 +61,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     let stringLength = randomInt(0, 1000);
     let flstringArray: string[] = randomArray(length, () => randomAsciiStr(stringLength));
     let newFlstringArray;
-    type = Types.FLArray(Types.FLString(stringLength), length);
+    type = BaseTypes.FLArray(BaseTypes.FLString(stringLength), length);
     buffer = type.write(flstringArray);
     // console.log(buffer);
     [newFlstringArray, newLength] = type.read(buffer, 0);
@@ -71,7 +71,7 @@ test("Test serialization and deserialization of Array types in BaseTypes", () =>
     length = randomInt(0, 100);
     let pstringArray: string[] = randomArray(length, () => randomStr(randomInt(0, 1000)));
     let newPstringArray;
-    type = Types.FLArray(Types.PString(Types.Int32), length);
+    type = BaseTypes.FLArray(BaseTypes.PString(BaseTypes.Int32), length);
     buffer = type.write(pstringArray);
     // console.log(buffer);
     [newPstringArray, newLength] = type.read(buffer, 0);

@@ -1,38 +1,38 @@
 import { Struct } from "../src/struct/struct";
 import { StructBuilder } from "../src/struct/structBuilder";
 import { randomInt, randomUUID } from "crypto";
-import { Types } from "../src/baseTypes";
+import { BaseTypes } from "../src/baseTypes";
 
 const config = [
-    { name: "row_int8", type: Types.Int8 },
-    { name: "row_uint8", type: Types.UInt8 },
+    { name: "row_int8", type: BaseTypes.Int8 },
+    { name: "row_uint8", type: BaseTypes.UInt8 },
 
-    { name: "row_int16", type: Types.Int16 },
-    { name: "row_int16le", type: Types.Int16LE },
-    { name: "row_uint16", type: Types.UInt16 },
-    { name: "row_uint16le", type: Types.UInt16LE },
+    { name: "row_int16", type: BaseTypes.Int16 },
+    { name: "row_int16le", type: BaseTypes.Int16LE },
+    { name: "row_uint16", type: BaseTypes.UInt16 },
+    { name: "row_uint16le", type: BaseTypes.UInt16LE },
 
-    { name: "row_int32", type: Types.Int32 },
-    { name: "row_int32le", type: Types.Int32LE },
-    { name: "row_uint32", type: Types.UInt32 },
-    { name: "row_uint32le", type: Types.UInt32LE },
+    { name: "row_int32", type: BaseTypes.Int32 },
+    { name: "row_int32le", type: BaseTypes.Int32LE },
+    { name: "row_uint32", type: BaseTypes.UInt32 },
+    { name: "row_uint32le", type: BaseTypes.UInt32LE },
 
-    { name: "row_int64", type: Types.Int64 },
-    { name: "row_int64le", type: Types.Int64LE },
-    { name: "row_uint64", type: Types.UInt64 },
-    { name: "row_uint64le", type: Types.UInt64LE },
+    { name: "row_int64", type: BaseTypes.Int64 },
+    { name: "row_int64le", type: BaseTypes.Int64LE },
+    { name: "row_uint64", type: BaseTypes.UInt64 },
+    { name: "row_uint64le", type: BaseTypes.UInt64LE },
 
-    { name: "row_float", type: Types.Float },
-    { name: "row_floatle", type: Types.FloatLE },
+    { name: "row_float", type: BaseTypes.Float },
+    { name: "row_floatle", type: BaseTypes.FloatLE },
 
-    { name: "row_double", type: Types.Double },
-    { name: "row_doublele", type: Types.DoubleLE },
+    { name: "row_double", type: BaseTypes.Double },
+    { name: "row_doublele", type: BaseTypes.DoubleLE },
 
-    { name: "row_flstring", type: Types.FLString(36) },
-    { name: "row_pstring", type: Types.PString(Types.Int32) },
+    { name: "row_flstring", type: BaseTypes.FLString(36) },
+    { name: "row_pstring", type: BaseTypes.PString(BaseTypes.Int32) },
 
-    { name: "row_default_int8", type: Types.Int8, default: 114 },
-    { name: "row_default_uint8", type: Types.UInt8, default: 114 },
+    { name: "row_default_int8", type: BaseTypes.Int8, default: 114 },
+    { name: "row_default_uint8", type: BaseTypes.UInt8, default: 114 },
 ];
 
 type data = {
@@ -143,7 +143,7 @@ test("Test StrutBuilder class to build struct objects", () => {
         .rowDoubleLE("row_doublele")
 
         .rowFLString("row_flstring", 36)
-        .rowPString("row_pstring", Types.Int32)
+        .rowPString("row_pstring", BaseTypes.Int32)
 
         .rowInt8("row_default_int8", 114)
         .rowUInt8("row_default_uint8", 114)

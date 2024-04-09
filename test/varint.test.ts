@@ -1,5 +1,5 @@
 import { randomInt } from "crypto";
-import { Types } from "../src/baseTypes";
+import { BaseTypes } from "../src/baseTypes";
 
 test("Test serialization and deserialization of String types in BaseTypes", () => {
     let number;
@@ -9,10 +9,9 @@ test("Test serialization and deserialization of String types in BaseTypes", () =
     let length;
 
     number = randomInt(0, 10000);
-    buffer = Types.VarInt32.write(number);
+    buffer = BaseTypes.VarInt32.write(number);
     offset = randomInt(0, 100);
-    // console.log(buffer);
-    [newNumber, length] = Types.VarInt32.read(Buffer.concat([Buffer.alloc(offset), buffer]), offset);
+    [newNumber, length] = BaseTypes.VarInt32.read(Buffer.concat([Buffer.alloc(offset), buffer]), offset);
     expect(length).toEqual(buffer.length);
     expect(newNumber).toEqual(number);
 });

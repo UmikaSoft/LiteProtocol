@@ -5,9 +5,8 @@ import { FLArrayLengthException } from "./exception/FLArrayLengthException";
 import { VarIntTooLongException } from "./exception/varintTooLongException";
 import { UnsignedException } from "./exception/unsignedException";
 import { defineType, defineTypeGenerator } from "./defineType";
-import { buffer } from "stream/consumers";
 
-export namespace Types {
+export namespace BaseTypes {
     // Int8
     export const Int8 = defineType<number>(
         (buffer, offset) => {
@@ -242,6 +241,10 @@ export namespace Types {
 
     // FLArray
 
+    /**
+     * @param {DataType<number>} param_0 item_type
+     * @param {BufferEncoding?} param_1 length
+     */
     const FLArrayGenerator = defineTypeGenerator<[DataType<any>, number], UniversalArray<any>>(
         (buffer, offset, item_type, length) => {
             const result: any[] = [];
@@ -267,6 +270,10 @@ export namespace Types {
 
     // PArray
 
+    /**
+     * @param {DataType<number>} param_0 item_type
+     * @param {BufferEncoding?} param_1 len_type
+     */
     const PArrayGenerator = defineTypeGenerator<[DataType<any>, DataType<number | bigint>], UniversalArray<any>>(
         (buffer, offset, item_type, len_type) => {
             const result: any[] = [];
@@ -293,6 +300,10 @@ export namespace Types {
 
     // FLString
 
+    /**
+     * @param {DataType<number>} param_0 length
+     * @param {BufferEncoding?} param_1 encoding
+     */
     export const FLString = defineTypeGenerator<[number, BufferEncoding?], string>(
         (buffer, offset, length, encoding) => {
             return [buffer.subarray(offset, offset + length).toString(encoding), length];
@@ -308,6 +319,10 @@ export namespace Types {
 
     // PString
 
+    /**
+     * @param {DataType<number>} param_0 len_type
+     * @param {BufferEncoding?} param_1 encoding
+     */
     export const PString = defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
         (buffer, offset, len_type, encoding) => {
             const [length, len_offset] = len_type.read(buffer, offset);

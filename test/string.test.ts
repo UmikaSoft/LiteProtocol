@@ -1,5 +1,5 @@
 import { randomInt } from "crypto";
-import { Types } from "../src/baseTypes";
+import { BaseTypes } from "../src/baseTypes";
 import { StructBuilder } from "../src/struct/structBuilder";
 import { randomAsciiStr, randomStr } from "./utils";
 
@@ -17,10 +17,10 @@ test("Test serialization and deserialization of String types in BaseTypes", () =
 
     str = randomStr(randomInt(0, 100));
     strBuffer = Buffer.from(str);
-    lenBuffer = Types.Int32.write(strBuffer.length);
+    lenBuffer = BaseTypes.Int32.write(strBuffer.length);
     buffer = Buffer.concat([lenBuffer, strBuffer]);
 
-    type = Types.PString(Types.Int32);
+    type = BaseTypes.PString(BaseTypes.Int32);
     expect(type.write(str)).toEqual(buffer);
     offset = randomInt(0, 100);
     [newStr, length] = type.read(Buffer.concat([Buffer.alloc(offset), buffer]), offset);
@@ -31,10 +31,10 @@ test("Test serialization and deserialization of String types in BaseTypes", () =
 
     str = randomStr(randomInt(0, 10000));
     strBuffer = Buffer.from(str);
-    lenBuffer = Types.Int64.write(BigInt(strBuffer.length));
+    lenBuffer = BaseTypes.Int64.write(BigInt(strBuffer.length));
     buffer = Buffer.concat([lenBuffer, strBuffer]);
 
-    type = Types.PString(Types.Int64);
+    type = BaseTypes.PString(BaseTypes.Int64);
     expect(type.write(str)).toEqual(buffer);
     offset = randomInt(0, 100);
     [newStr, length] = type.read(Buffer.concat([Buffer.alloc(offset), buffer]), offset);
@@ -71,7 +71,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     // PString
 
-    struct = StructBuilder.new().rowInt8("row_int8").rowPString("row_string", Types.Int32).rowInt32("row_int32").build<{
+    struct = StructBuilder.new().rowInt8("row_int8").rowPString("row_string", BaseTypes.Int32).rowInt32("row_int32").build<{
         row_int8: number;
         row_string: string;
         row_int32: number;
