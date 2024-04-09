@@ -2,7 +2,7 @@ import assert from "assert";
 import { DataType } from "./dataType";
 import { FLStringLengthException } from "./exception/FLStringLengthException";
 import { FLArrayLengthException } from "./exception/FLArrayLengthException";
-import { VarIntTooLongException } from "./exception/varintTooLongException";
+import { VarIntTooLongException } from "./exception/varIntTooLongException";
 import { UnsignedException } from "./exception/unsignedException";
 import { defineType, defineTypeGenerator } from "./defineType";
 
