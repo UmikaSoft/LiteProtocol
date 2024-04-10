@@ -5,6 +5,7 @@ import { FLArrayLengthException } from "./exception/FLArrayLengthException";
 import { VarIntTooLongException } from "./exception/varIntTooLongException";
 import { UnsignedException } from "./exception/unsignedException";
 import { defineType, defineTypeGenerator } from "./defineType";
+import { VarIntTooBigException } from "./exception/varIntTooBigException";
 
 export namespace BaseTypes {
     // Int8
@@ -241,40 +242,35 @@ export namespace BaseTypes {
 
     // FLArray
 
-    /**
-     * @param {DataType<number>} param_0 item_type
-     * @param {BufferEncoding?} param_1 length
-     */
-    const FLArrayGenerator = defineTypeGenerator<[DataType<any>, number], UniversalArray<any>>(
-        (buffer, offset, item_type, length) => {
-            const result: any[] = [];
-            let array_offset = 0;
-            for (let i = 0; i < length; i++) {
-                const [value, item_offset] = item_type.read(buffer, offset + array_offset);
-                array_offset += item_offset;
-                result.push(value);
-            }
-            return [result, array_offset];
-        },
-        (value, item_type, length) => {
-            const result = [];
-            if (value.length != length) throw new FLArrayLengthException(length, value.length);
-            for (let item of value) result.push(item_type.write(item));
-            return Buffer.concat(result);
-        },
-    );
-
-    export function FLArray<T>(...param: [DataType<T>, number]): DataType<UniversalArray<T>> {
-        return FLArrayGenerator(...param);
-    }
+    export const FLArray: <T>(item_type: DataType<T>, length: number) => DataType<UniversalArray<T>> =
+        defineTypeGenerator<[DataType<any>, number], UniversalArray<any>>(
+            (buffer, offset, item_type, length) => {
+                const result: any[] = [];
+                let array_offset = 0;
+                for (let i = 0; i < length; i++) {
+                    const [value, item_offset] = item_type.read(buffer, offset + array_offset);
+                    array_offset += item_offset;
+                    result.push(value);
+                }
+                return [result, array_offset];
+            },
+            (value, item_type, length) => {
+                const result = [];
+                if (value.length != length) throw new FLArrayLengthException(length, value.length);
+                for (let item of value) result.push(item_type.write(item));
+                return Buffer.concat(result);
+            },
+        );
 
     // PArray
 
-    /**
-     * @param {DataType<number>} param_0 item_type
-     * @param {BufferEncoding?} param_1 len_type
-     */
-    const PArrayGenerator = defineTypeGenerator<[DataType<any>, DataType<number | bigint>], UniversalArray<any>>(
+    export const PArray: <T>(
+        item_type: DataType<T>,
+        len_type: DataType<number | bigint>,
+    ) => DataType<UniversalArray<T>> = defineTypeGenerator<
+        [DataType<any>, DataType<number | bigint>],
+        UniversalArray<any>
+    >(
         (buffer, offset, item_type, len_type) => {
             const result: any[] = [];
             let [length, array_offset] = len_type.read(buffer, offset);
@@ -294,17 +290,12 @@ export namespace BaseTypes {
         },
     );
 
-    export function PArray<T>(...param: [DataType<T>, DataType<number | bigint>]): DataType<UniversalArray<T>> {
-        return PArrayGenerator(...param);
-    }
-
     // FLString
 
-    /**
-     * @param {DataType<number>} param_0 length
-     * @param {BufferEncoding?} param_1 encoding
-     */
-    export const FLString = defineTypeGenerator<[number, BufferEncoding?], string>(
+    export const FLString: (length: number, encoding?: BufferEncoding) => DataType<string> = defineTypeGenerator<
+        [number, BufferEncoding?],
+        string
+    >(
         (buffer, offset, length, encoding) => {
             return [buffer.subarray(offset, offset + length).toString(encoding), length];
         },
@@ -319,23 +310,20 @@ export namespace BaseTypes {
 
     // PString
 
-    /**
-     * @param {DataType<number>} param_0 len_type
-     * @param {BufferEncoding?} param_1 encoding
-     */
-    export const PString = defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
-        (buffer, offset, len_type, encoding) => {
-            const [length, len_offset] = len_type.read(buffer, offset);
-            return [
-                buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
-                len_offset + Number(length),
-            ];
-        },
-        (value, len_type, encoding) => {
-            const buffer = Buffer.from(value, encoding);
-            return Buffer.concat([len_type.write(buffer.length), buffer]);
-        },
-    );
+    export const PString: (len_type: DataType<number | bigint>, encoding?: BufferEncoding) => DataType<string> =
+        defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
+            (buffer, offset, len_type, encoding) => {
+                const [length, len_offset] = len_type.read(buffer, offset);
+                return [
+                    buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
+                    len_offset + Number(length),
+                ];
+            },
+            (value, len_type, encoding) => {
+                const buffer = Buffer.from(value, encoding);
+                return Buffer.concat([len_type.write(buffer.length), buffer]);
+            },
+        );
 
     // VarInt
 
@@ -359,12 +347,12 @@ export namespace BaseTypes {
             const buffer = Buffer.alloc(5);
             let n = 0;
             for (; value > 127; n++) {
+                assert(n < 5, new VarIntTooBigException());
                 buffer[n] = (value & 0x7f) | 0x80;
                 value = value >> 7;
             }
             buffer[n] = value & 0xff;
-            n++;
-            return buffer.subarray(0, n);
+            return buffer.subarray(0, n + 1);
         },
     );
 
@@ -388,12 +376,12 @@ export namespace BaseTypes {
             const buffer = Buffer.alloc(10);
             let n = 0;
             for (; value > 127; n++) {
+                assert(n < 10, new VarIntTooBigException());
                 buffer[n] = Number((value & 0x7fn) | 0x80n);
                 value = value >> 7n;
             }
             buffer[n] = Number(value & 0xffn);
-            n++;
-            return buffer.subarray(0, n);
+            return buffer.subarray(0, n + 1);
         },
     );
 }
