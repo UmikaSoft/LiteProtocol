@@ -145,10 +145,9 @@ export namespace BaseTypes {
         (buffer, offset) => {
             return [buffer.readBigInt64BE(offset), 8];
         },
-        // 兼容 PString / PArray 长度部分
         (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
-            buffer.writeBigInt64BE(BigInt(value));
+            buffer.writeBigInt64BE(BigInt(value)); // 兼容 PString / PArray 长度部分
             return buffer;
         },
     );
@@ -159,7 +158,7 @@ export namespace BaseTypes {
         },
         (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
-            buffer.writeBigInt64LE(BigInt(value));
+            buffer.writeBigInt64LE(BigInt(value)); // 兼容 PString / PArray 长度部分
             return buffer;
         },
     );
@@ -172,7 +171,7 @@ export namespace BaseTypes {
         },
         (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
-            buffer.writeBigUInt64BE(BigInt(value));
+            buffer.writeBigUInt64BE(BigInt(value)); // 兼容 PString / PArray 长度部分
             return buffer;
         },
     );
@@ -183,7 +182,7 @@ export namespace BaseTypes {
         },
         (value: bigint | number) => {
             const buffer = Buffer.alloc(8);
-            buffer.writeBigUInt64LE(BigInt(value));
+            buffer.writeBigUInt64LE(BigInt(value)); // 兼容 PString / PArray 长度部分
             return buffer;
         },
     );
@@ -372,6 +371,7 @@ export namespace BaseTypes {
             return [value, bytesRead];
         },
         (value) => {
+            value = BigInt(value); // 兼容 PString / PArray 长度部分
             assert(value >= 0, new UnsignedException());
             const buffer = Buffer.alloc(10);
             let n = 0;
