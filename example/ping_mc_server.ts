@@ -1,5 +1,5 @@
 import { createConnection } from "net";
-import { StructBuilder, Types } from "../src/";
+import { StructBuilder, BaseTypes } from "../src/";
 
 const enum State {
     HANDSHAKE = 0,
@@ -9,7 +9,7 @@ const enum State {
 
 const Handshake = StructBuilder.new()
     .rowVarInt32("protocol_version")
-    .rowPString("server_address", Types.VarInt32)
+    .rowPString("server_address")(BaseTypes.VarInt32)
     .rowUInt16("server_port")
     .rowVarInt32("next_status")
     .build<{
@@ -21,18 +21,18 @@ const Handshake = StructBuilder.new()
 
 const StatusRequest = StructBuilder.new().build<{}>();
 const StatusResponse = StructBuilder.new()
-    .rowPString("json_response", Types.VarInt32)
+    .rowPString("json_response")(BaseTypes.VarInt32)
     .build<{ json_response: string }>();
 
 function createMcPacket(packet_id: number, data: Buffer): Buffer {
-    let tempBuffer = Buffer.concat([Types.VarInt32.write(packet_id), data]);
-    return Buffer.concat([Types.VarInt32.write(tempBuffer.length), tempBuffer]);
+    let tempBuffer = Buffer.concat([BaseTypes.VarInt32.write(packet_id), data]);
+    return Buffer.concat([BaseTypes.VarInt32.write(tempBuffer.length), tempBuffer]);
 }
 
 function readMcPacket(pack: Buffer): [{ id: number; data: Buffer }, number] {
     let offset = 0;
-    let [length, length_offset] = Types.VarInt32.read(pack, 0);
-    let [id, id_offset] = Types.VarInt32.read(pack, length_offset);
+    let [length, length_offset] = BaseTypes.VarInt32.read(pack, 0);
+    let [id, id_offset] = BaseTypes.VarInt32.read(pack, length_offset);
     offset = length_offset + id_offset;
     const data = pack.subarray(offset, offset + length);
     return [{ id, data }, offset + length];
@@ -50,7 +50,7 @@ const client = createConnection({ host, port }, () => {
         tempBuffer = Buffer.concat([tempBuffer, data]);
         while (true) {
             if (tempBuffer.length == 0) break;
-            let [length, _] = Types.VarInt32.read(tempBuffer, 0);
+            let [length, _] = BaseTypes.VarInt32.read(tempBuffer, 0);
             if (length > tempBuffer.length) break;
 
             let [{ id, data: pack_data }, pack_offset] = readMcPacket(tempBuffer);
