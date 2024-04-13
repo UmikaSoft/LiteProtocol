@@ -69,7 +69,7 @@ type data = {
 
 function getRandomData(): data {
     return {
-        row_int8: randomInt(-128, 127),
+        row_int8: randomInt(-128, 128),
         row_uint8: randomInt(0, 255),
 
         row_int16: randomInt(-1000, 1000),
@@ -110,9 +110,9 @@ test("Test serialization and deserialization of Struct objects", () => {
 
     for (let [key, value] of Object.entries(newData)) {
         // 逐一对比以防止序列化bigint报错以及float精准度问题
-        // console.log(key, value, (newData as any)[key]);
-        if (typeof value === "number") expect(value).toBeCloseTo((data as any)[key] || 114);
-        else expect(value).toEqual((data as any)[key] || 114);
+        const fixedValue = (data as any)[key];
+        if (typeof value === "number") expect(value).toBeCloseTo(fixedValue !== undefined ? fixedValue : 114);
+        else expect(value).toEqual(fixedValue !== undefined ? fixedValue : 114);
     }
 });
 

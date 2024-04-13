@@ -1,5 +1,6 @@
 import { createConnection } from "net";
-import { StructBuilder, BaseTypes } from "../src/";
+import { StructBuilder, BaseTypes, write, Package, read } from "../src/";
+import { Socket } from "net";
 
 const enum State {
     HANDSHAKE = 0,
@@ -7,35 +8,48 @@ const enum State {
     LOGIN = 2,
 }
 
-const Handshake = StructBuilder.new()
-    .rowVarInt32("protocol_version")
-    .rowPString("server_address")(BaseTypes.VarInt32)
-    .rowUInt16("server_port")
-    .rowVarInt32("next_status")
-    .build<{
-        protocol_version: number;
-        server_address: string;
-        server_port: number;
-        next_status: State;
-    }>();
+namespace Packages {
+    export const Handshake = StructBuilder.new()
+        .rowVarInt32("protocol_version")
+        .rowPString("server_address")(BaseTypes.VarInt32)
+        .rowUInt16("server_port")
+        .rowVarInt32("next_status")
+        .build<{
+            protocol_version: number;
+            server_address: string;
+            server_port: number;
+            next_status: State;
+        }>()
+        .toPackage();
 
-const StatusRequest = StructBuilder.new().build<{}>();
-const StatusResponse = StructBuilder.new()
-    .rowPString("json_response")(BaseTypes.VarInt32)
-    .build<{ json_response: string }>();
+    export const StatusRequest = StructBuilder.new().build<{}>().toPackage();
 
-function createMcPacket(packet_id: number, data: Buffer): Buffer {
-    let tempBuffer = Buffer.concat([BaseTypes.VarInt32.write(packet_id), data]);
-    return Buffer.concat([BaseTypes.VarInt32.write(tempBuffer.length), tempBuffer]);
+    export const StatusResponse = StructBuilder.new()
+        .rowPString("json_response")(BaseTypes.VarInt32)
+        .build<{ json_response: string }>()
+        .toPackage();
 }
 
-function readMcPacket(pack: Buffer): [{ id: number; data: Buffer }, number] {
-    let offset = 0;
-    let [length, length_offset] = BaseTypes.VarInt32.read(pack, 0);
-    let [id, id_offset] = BaseTypes.VarInt32.read(pack, length_offset);
-    offset = length_offset + id_offset;
-    const data = pack.subarray(offset, offset + length);
-    return [{ id, data }, offset + length];
+type casedPacket = { packetId: number; data: Buffer };
+
+function createCasedPacketBuffer(packetId: number, data: Buffer): Buffer {
+    const payloadBuffer = Buffer.concat([write(BaseTypes.VarInt32, packetId), data]);
+    return Buffer.concat([write(BaseTypes.VarInt32, payloadBuffer.length), payloadBuffer]);
+}
+
+function readCasedPacket(buffer: Buffer): [casedPacket | undefined, number] {
+    const [length, lengthOffset] = read(BaseTypes.VarInt32, buffer, 0);
+    if (length < buffer.length) {
+        return [undefined, 0];
+    }
+    const [packetId, idOffset] = read(BaseTypes.VarInt32, buffer, lengthOffset);
+    const offset = lengthOffset + idOffset;
+    const data = buffer.subarray(offset, offset + length);
+    return [{ packetId, data }, offset + length];
+}
+
+function sendMcPacket(client: Socket, packetId: number, packet: Package<any>) {
+    client.write(createCasedPacketBuffer(packetId, packet.buffer));
 }
 
 const host = "mc.xasmc.xyz";
@@ -44,46 +58,49 @@ let state: State = State.HANDSHAKE;
 
 const client = createConnection({ host, port }, () => {
     console.log("已连接到服务器");
+
     let tempBuffer = Buffer.alloc(0);
-    // let offset = 0;
+
     client.on("data", (data) => {
         tempBuffer = Buffer.concat([tempBuffer, data]);
-        while (true) {
-            if (tempBuffer.length == 0) break;
-            let [length, _] = BaseTypes.VarInt32.read(tempBuffer, 0);
-            if (length > tempBuffer.length) break;
 
-            let [{ id, data: pack_data }, pack_offset] = readMcPacket(tempBuffer);
-            tempBuffer = tempBuffer.subarray(pack_offset);
+        while (true) {
+            const [casedPacketData, casedPacketOffset] = readCasedPacket(tempBuffer);
+            if (!casedPacketData) break;
+
+            tempBuffer = tempBuffer.subarray(casedPacketOffset);
 
             // 处理数据包
+            const { packetId, data: packetData } = casedPacketData;
             if (state == State.HANDSHAKE) {
+                // handshaking
                 // do something
             } else if (state == State.STATUS) {
-                if (id == 0) {
-                    // Status Response
-                    const [pack_info, pack_length] = StatusResponse.read(pack_data, 0);
-                    console.log({ state, id, pack_info, pack_length });
+                // queuing server status
+                if (packetId == 0) {
+                    const pack = Packages.StatusResponse.fromBuffer(packetData, 0);
+                    console.log(pack);
                 }
             } else if (state == State.LOGIN) {
+                // logging in
                 // do something
             }
         }
     });
 
     // 握手 切换到 Status 状态
-    client.write(
-        createMcPacket(
-            0,
-            Handshake.write({
-                protocol_version: 765,
-                server_address: host,
-                server_port: port,
-                next_status: 1,
-            }),
-        ),
-    );
-    state = State.STATUS;
-    // 发送状态请求包
-    client.write(createMcPacket(0, StatusRequest.write({})));
+    sendMcPacket(
+        client,
+        0,
+        Packages.Handshake.formData({
+            protocol_version: 765,
+            server_address: host,
+            server_port: port,
+            next_status: State.STATUS,
+        }),
+    ),
+        (state = State.STATUS);
+
+    // 请求服务器状态
+    sendMcPacket(client, 0, Packages.StatusRequest.formData({}));
 });

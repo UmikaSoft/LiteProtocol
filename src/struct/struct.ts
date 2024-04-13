@@ -1,4 +1,6 @@
 import { DataType } from "../dataType";
+import { definePackage } from "../package/definePackages";
+import { PackageType } from "../package/package";
 
 export type StructConf = Array<{ name: string; type: DataType<any>; default?: any }>;
 export type StructData = { [row_name: string]: any };
@@ -11,9 +13,10 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
     }
 
     write(value: T): Buffer {
-        let result: Buffer[] = [];
+        const result: Buffer[] = [];
         for (let { name, type, default: defaultValue } of this.config) {
-            result.push(type.write(value[name] || defaultValue));
+            const fixedValue = value[name];
+            result.push(type.write(fixedValue !== undefined ? fixedValue : defaultValue));
         }
         return Buffer.concat(result);
     }
@@ -30,5 +33,9 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
 
     getConf() {
         return this.config;
+    }
+
+    toPackage(): PackageType<T> {
+        return definePackage(this);
     }
 }
