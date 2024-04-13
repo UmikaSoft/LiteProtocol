@@ -31,3 +31,11 @@ export class CacheTree {
         return node.value;
     }
 }
+
+export function read<T>(type: DataType<T>, buffer: Buffer, offset: number = 0): [T, number] {
+    return type.read(buffer, offset);
+}
+
+export function write<T>(type: DataType<T>, value: T): Buffer {
+    return type.write(value);
+}
