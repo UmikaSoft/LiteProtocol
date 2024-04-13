@@ -13,9 +13,10 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
     }
 
     write(value: T): Buffer {
-        let result: Buffer[] = [];
+        const result: Buffer[] = [];
         for (let { name, type, default: defaultValue } of this.config) {
-            result.push(type.write(value[name] || defaultValue));
+            const fixedValue = value[name];
+            result.push(type.write(fixedValue !== undefined ? fixedValue : defaultValue));
         }
         return Buffer.concat(result);
     }

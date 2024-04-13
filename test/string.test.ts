@@ -58,7 +58,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
         row_int32: number;
     }>();
     data = {
-        row_int8: randomInt(-128, 127),
+        row_int8: randomInt(-128, 128),
         row_string: randomAsciiStr(10),
         row_int32: randomInt(-10000, 10000),
     };
@@ -81,7 +81,7 @@ test("Test the serialization and deserialization of String types in BaseTypes in
             row_int32: number;
         }>();
     data = {
-        row_int8: randomInt(-128, 127),
+        row_int8: randomInt(-128, 128),
         row_string: randomStr(randomInt(0, 10000)),
         row_int32: randomInt(-10000, 10000),
     };

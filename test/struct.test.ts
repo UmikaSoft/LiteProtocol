@@ -69,7 +69,7 @@ type data = {
 
 function getRandomData(): data {
     return {
-        row_int8: randomInt(-128, 127),
+        row_int8: randomInt(-128, 128),
         row_uint8: randomInt(0, 255),
 
         row_int16: randomInt(-1000, 1000),
