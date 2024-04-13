@@ -1,5 +1,5 @@
 import { createConnection } from "net";
-import { StructBuilder, BaseTypes, definePackage, write, Package } from "../src/";
+import { StructBuilder, BaseTypes, write, Package, read } from "../src/";
 import { Socket } from "net";
 
 const enum State {
@@ -38,11 +38,11 @@ function createCasedPacketBuffer(packetId: number, data: Buffer): Buffer {
 }
 
 function readCasedPacket(buffer: Buffer): [casedPacket | undefined, number] {
-    const [length, lengthOffset] = BaseTypes.VarInt32.read(buffer, 0);
+    const [length, lengthOffset] = read(BaseTypes.VarInt32, buffer, 0);
     if (length < buffer.length) {
         return [undefined, 0];
     }
-    const [packetId, idOffset] = BaseTypes.VarInt32.read(buffer, lengthOffset);
+    const [packetId, idOffset] = read(BaseTypes.VarInt32, buffer, lengthOffset);
     const offset = lengthOffset + idOffset;
     const data = buffer.subarray(offset, offset + length);
     return [{ packetId, data }, offset + length];
