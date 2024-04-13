@@ -110,9 +110,9 @@ test("Test serialization and deserialization of Struct objects", () => {
 
     for (let [key, value] of Object.entries(newData)) {
         // 逐一对比以防止序列化bigint报错以及float精准度问题
-        // console.log(key, value, (newData as any)[key]);
-        if (typeof value === "number") expect(value).toBeCloseTo((data as any)[key] || 114);
-        else expect(value).toEqual((data as any)[key] || 114);
+        const fixedValue = (data as any)[key];
+        if (typeof value === "number") expect(value).toBeCloseTo(fixedValue !== undefined ? fixedValue : 114);
+        else expect(value).toEqual(fixedValue !== undefined ? fixedValue : 114);
     }
 });
 
