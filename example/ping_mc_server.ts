@@ -1,5 +1,5 @@
 import { createConnection } from "net";
-import { StructBuilder, BaseTypes } from "../src/";
+import { StructBuilder, BaseTypes, definePackage } from "../src/";
 
 const enum State {
     HANDSHAKE = 0,
@@ -7,22 +7,24 @@ const enum State {
     LOGIN = 2,
 }
 
-const Handshake = StructBuilder.new()
-    .rowVarInt32("protocol_version")
-    .rowPString("server_address")(BaseTypes.VarInt32)
-    .rowUInt16("server_port")
-    .rowVarInt32("next_status")
-    .build<{
-        protocol_version: number;
-        server_address: string;
-        server_port: number;
-        next_status: State;
-    }>();
+const Handshake = definePackage(
+    StructBuilder.new()
+        .rowVarInt32("protocol_version")
+        .rowPString("server_address")(BaseTypes.VarInt32)
+        .rowUInt16("server_port")
+        .rowVarInt32("next_status")
+        .build<{
+            protocol_version: number;
+            server_address: string;
+            server_port: number;
+            next_status: State;
+        }>(),
+);
 
-const StatusRequest = StructBuilder.new().build<{}>();
-const StatusResponse = StructBuilder.new()
-    .rowPString("json_response")(BaseTypes.VarInt32)
-    .build<{ json_response: string }>();
+const StatusRequest = definePackage(StructBuilder.new().build<{}>());
+const StatusResponse = definePackage(
+    StructBuilder.new().rowPString("json_response")(BaseTypes.VarInt32).build<{ json_response: string }>(),
+);
 
 function createMcPacket(packet_id: number, data: Buffer): Buffer {
     let tempBuffer = Buffer.concat([BaseTypes.VarInt32.write(packet_id), data]);
@@ -62,8 +64,8 @@ const client = createConnection({ host, port }, () => {
             } else if (state == State.STATUS) {
                 if (id == 0) {
                     // Status Response
-                    const [pack_info, pack_length] = StatusResponse.read(pack_data, 0);
-                    console.log({ state, id, pack_info, pack_length });
+                    const { data, buffer } = StatusResponse.fromBuffer(pack_data, 0);
+                    console.log({ state, id, data, buffer, package_length: buffer.length });
                 }
             } else if (state == State.LOGIN) {
                 // do something
@@ -75,12 +77,12 @@ const client = createConnection({ host, port }, () => {
     client.write(
         createMcPacket(
             0,
-            Handshake.write({
+            Handshake.formData({
                 protocol_version: 765,
                 server_address: host,
                 server_port: port,
                 next_status: 1,
-            }),
+            }).buffer,
         ),
     );
     state = State.STATUS;
