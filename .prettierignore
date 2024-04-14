@@ -3,5 +3,9 @@
 pnpm-lock.yaml
 tsconfig.json
 
+# 使用 markdownlint 格式化 markdown 文件
+
+**/*.md
+
 # Github Actions 不可以修改 .github
 .github
