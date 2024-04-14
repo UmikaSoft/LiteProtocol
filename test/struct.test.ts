@@ -150,5 +150,5 @@ test("Test StrutBuilder class to build struct objects", () => {
 
         .build<data>();
 
-    expect(struct.getConf()).toEqual(config);
+    expect(struct.config).toEqual(config);
 });
