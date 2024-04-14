@@ -7,7 +7,7 @@ export interface PackageType<T extends StructData> extends DataType<T> {
     fromBuffer(buffer: Buffer, offset: number): Package<T>;
 }
 
-export class Package<T extends StructData> {
+export abstract class Package<T extends StructData> {
     readonly data: T;
     readonly buffer: Buffer;
 
