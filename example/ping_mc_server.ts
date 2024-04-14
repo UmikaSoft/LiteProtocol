@@ -65,13 +65,13 @@ const client = createConnection({ host, port }, () => {
         tempBuffer = Buffer.concat([tempBuffer, data]);
 
         while (true) {
-            const [casedPacketData, casedPacketOffset] = readCasedPacket(tempBuffer);
-            if (!casedPacketData) break;
+            const [casedPacket, casedPacketOffset] = readCasedPacket(tempBuffer);
+            if (!casedPacket) break;
 
             tempBuffer = tempBuffer.subarray(casedPacketOffset);
 
             // 处理数据包
-            const { packetId, data: packetData } = casedPacketData;
+            const { packetId, data: packetData } = casedPacket;
             if (state == State.HANDSHAKE) {
                 // handshaking
                 // do something
@@ -98,8 +98,8 @@ const client = createConnection({ host, port }, () => {
             server_port: port,
             next_status: State.STATUS,
         }),
-    ),
-        (state = State.STATUS);
+    );
+    state = State.STATUS;
 
     // 请求服务器状态
     sendMcPacket(client, 0, Packages.StatusRequest.formData({}));
