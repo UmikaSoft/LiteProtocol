@@ -1,6 +1,6 @@
-import { createConnection } from "net";
+import { createConnection, Socket } from "net";
 import { StructBuilder, BaseTypes, write, Package, read } from "../src/";
-import { Socket } from "net";
+import { format } from "util";
 
 const enum State {
     HANDSHAKE = 0,
@@ -38,8 +38,9 @@ function createCasedPacketBuffer(packetId: number, data: Buffer): Buffer {
 }
 
 function readCasedPacket(buffer: Buffer): [casedPacket | undefined, number] {
+    if (buffer.length === 0) return [undefined, 0];
     const [length, lengthOffset] = read(BaseTypes.VarInt32, buffer, 0);
-    if (length < buffer.length) {
+    if (length > buffer.length) {
         return [undefined, 0];
     }
     const [packetId, idOffset] = read(BaseTypes.VarInt32, buffer, lengthOffset);
@@ -52,7 +53,7 @@ function sendMcPacket(client: Socket, packetId: number, packet: Package<any>) {
     client.write(createCasedPacketBuffer(packetId, packet.buffer));
 }
 
-const host = "mc.xasmc.xyz";
+const host = "2b2t.xin";
 const port = 25565;
 let state: State = State.HANDSHAKE;
 
@@ -62,6 +63,8 @@ const client = createConnection({ host, port }, () => {
     let tempBuffer = Buffer.alloc(0);
 
     client.on("data", (data) => {
+        console.log("awa");
+        console.log(data);
         tempBuffer = Buffer.concat([tempBuffer, data]);
 
         while (true) {
@@ -86,6 +89,14 @@ const client = createConnection({ host, port }, () => {
                 // do something
             }
         }
+    });
+
+    client.on("error", (err) => {
+        console.log(err);
+    });
+
+    client.on("end", () => {
+        console.log("end");
     });
 
     // 握手 切换到 Status 状态
