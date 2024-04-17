@@ -15,3 +15,11 @@ export function randomAsciiStr(length: number) {
     for (let i = 0; i < length; i++) result += choices[randomInt(choices.length)];
     return result;
 }
+
+export function randomArray<T>(length: number, f: () => T): T[] {
+    const result: any[] = [];
+    for (let i = 0; i < length; i++) {
+        result.push(f());
+    }
+    return result;
+}

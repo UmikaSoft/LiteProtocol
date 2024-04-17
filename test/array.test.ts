@@ -1,14 +1,6 @@
 import { randomInt } from "crypto";
 import { BaseTypes } from "../src/baseTypes";
-import { randomAsciiStr, randomStr } from "./utils";
-
-function randomArray(length: number, f: () => any) {
-    const result: any[] = [];
-    for (let i = 0; i < length; i++) {
-        result.push(f());
-    }
-    return result;
-}
+import { randomArray, randomAsciiStr, randomStr } from "./utils";
 
 test("Test serialization and deserialization of Array types in BaseTypes", () => {
     let buffer;
