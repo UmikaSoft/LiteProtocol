@@ -1,6 +1,5 @@
 import { createConnection, Socket } from "net";
-import { StructBuilder, BaseTypes, write, Package, read } from "../src/";
-import { format } from "util";
+import { StructBuilder, BaseTypes, Package, read, BufferStream } from "../dist";
 
 const enum State {
     HANDSHAKE = 0,
@@ -33,45 +32,49 @@ namespace Packages {
 type casedPacket = { packetId: number; data: Buffer };
 
 function createCasedPacketBuffer(packetId: number, data: Buffer): Buffer {
-    const payloadBuffer = Buffer.concat([write(BaseTypes.VarInt32, packetId), data]);
-    return Buffer.concat([write(BaseTypes.VarInt32, payloadBuffer.length), payloadBuffer]);
+    const payloadBS = new BufferStream();
+    payloadBS.write(BaseTypes.VarInt32, packetId);
+    payloadBS.write(data);
+
+    const bs = new BufferStream();
+    bs.write(BaseTypes.VarInt32, payloadBS.length);
+    bs.write(payloadBS.buffer);
+
+    return bs.buffer;
 }
 
-function readCasedPacket(buffer: Buffer): [casedPacket | undefined, number] {
-    if (buffer.length === 0) return [undefined, 0];
-    const [length, lengthOffset] = read(BaseTypes.VarInt32, buffer, 0);
-    if (length > buffer.length) {
-        return [undefined, 0];
-    }
-    const [packetId, idOffset] = read(BaseTypes.VarInt32, buffer, lengthOffset);
-    const offset = lengthOffset + idOffset;
-    const data = buffer.subarray(offset, offset + length);
-    return [{ packetId, data }, offset + length];
+function readCasedPacket(bs: BufferStream): casedPacket | void {
+    if (bs.length === 0) return;
+    const [length, offset] = read(BaseTypes.VarInt32, bs.buffer, 0);
+    if (length > bs.length) return;
+    bs.read(offset);
+
+    const payload = bs.read(length);
+    const payloadBS = new BufferStream(payload);
+
+    const packetId = payloadBS.read(BaseTypes.VarInt32);
+    const data = payloadBS.read(payloadBS.length);
+    return { packetId, data };
 }
 
 function sendMcPacket(client: Socket, packetId: number, packet: Package<any>) {
     client.write(createCasedPacketBuffer(packetId, packet.buffer));
 }
 
-const host = "2b2t.xin";
+const host = "mc.xasmc.xyz";
 const port = 25565;
 let state: State = State.HANDSHAKE;
 
 const client = createConnection({ host, port }, () => {
     console.log("已连接到服务器");
 
-    let tempBuffer = Buffer.alloc(0);
+    const bs = new BufferStream();
 
     client.on("data", (data) => {
-        console.log("awa");
-        console.log(data);
-        tempBuffer = Buffer.concat([tempBuffer, data]);
-
+        bs.write(data);
         while (true) {
-            const [casedPacket, casedPacketOffset] = readCasedPacket(tempBuffer);
+            const casedPacket = readCasedPacket(bs);
             if (!casedPacket) break;
-
-            tempBuffer = tempBuffer.subarray(casedPacketOffset);
 
             // 处理数据包
             const { packetId, data: packetData } = casedPacket;
