@@ -1,3 +1,1 @@
-export class LiteProtocolError extends Error {
-
-}
+export class LiteProtocolError extends Error {}
