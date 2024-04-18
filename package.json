@@ -5,7 +5,7 @@
     "types": "dist/index.d.js",
     "scripts": {
         "test": "jest",
-        "build": "tsc"
+        "build": "rm -rf ./dist && tsc"
     },
     "keywords": [
         "lightweight",
