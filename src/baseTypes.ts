@@ -6,6 +6,7 @@ import { VarIntTooLongException } from "./exception/varIntTooLongException";
 import { UnsignedException } from "./exception/unsignedException";
 import { defineType, defineTypeGenerator } from "./defineType";
 import { VarIntTooBigException } from "./exception/varIntTooBigException";
+import { BufferOutOfBoundsException } from "./exception/bufferOutOfBoundsException";
 
 export namespace BaseTypes {
     // Int8
@@ -296,6 +297,7 @@ export namespace BaseTypes {
         string
     >(
         (buffer, offset, length, encoding) => {
+            if (offset + length > buffer.length) throw new BufferOutOfBoundsException();
             return [buffer.subarray(offset, offset + length).toString(encoding), length];
         },
         (value, length, encoding) => {
@@ -313,10 +315,10 @@ export namespace BaseTypes {
         defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
             (buffer, offset, len_type, encoding) => {
                 const [length, len_offset] = len_type.read(buffer, offset);
-                return [
-                    buffer.subarray(offset + len_offset, offset + len_offset + Number(length)).toString(encoding),
-                    len_offset + Number(length),
-                ];
+                const start = offset + len_offset;
+                const end = start + Number(length);
+                if (end > buffer.length) throw new BufferOutOfBoundsException();
+                return [buffer.subarray(start, end).toString(encoding), len_offset + Number(length)];
             },
             (value, len_type, encoding) => {
                 const buffer = Buffer.from(value, encoding);
@@ -334,6 +336,7 @@ export namespace BaseTypes {
             let byte;
             do {
                 byte = buffer[offset + bytesRead];
+                if (byte === undefined) throw new BufferOutOfBoundsException();
                 bytesRead++;
                 value |= (byte & 0x7f) << shift;
                 shift += 7;
@@ -363,6 +366,7 @@ export namespace BaseTypes {
             let byte;
             do {
                 byte = buffer[offset + bytesRead];
+                if (byte === undefined) throw new BufferOutOfBoundsException();
                 bytesRead++;
                 value |= BigInt((byte & 0x7f) << shift);
                 shift += 7;

@@ -2,6 +2,7 @@ import { randomInt } from "crypto";
 import { BaseTypes } from "../src/baseTypes";
 import { StructBuilder } from "../src/struct/structBuilder";
 import { randomAsciiStr, randomStr } from "./utils";
+import { BufferOutOfBoundsException } from "../src/exception/bufferOutOfBoundsException";
 
 test("Test serialization and deserialization of String types in BaseTypes", () => {
     let type;
@@ -91,4 +92,14 @@ test("Test the serialization and deserialization of String types in BaseTypes in
 
     expect(length).toEqual(buffer.length);
     expect(newData).toEqual(data);
+});
+
+test("Test buffer out of bounds", () => {
+    const buffer = Buffer.alloc(10);
+    try {
+        BaseTypes.FLString(buffer.length + 1).read(buffer, 0);
+        throw Error();
+    } catch (e) {
+        if (!(e instanceof BufferOutOfBoundsException)) throw e;
+    }
 });
