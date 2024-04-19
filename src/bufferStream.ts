@@ -1,7 +1,7 @@
 import { DataType } from "./dataType";
 
-export class BufferStream {
-    private innerBuffer: Buffer;
+export abstract class BaseBufferStream {
+    protected innerBuffer: Buffer;
     get buffer() {
         return this.innerBuffer;
     }
@@ -13,28 +13,50 @@ export class BufferStream {
     constructor(buffer: Buffer = Buffer.alloc(0)) {
         this.innerBuffer = buffer;
     }
+}
 
-    read<T>(type: DataType<T>): T;
-    read(length: number): Buffer;
-    read<T>(type_or_length: DataType<T> | number): T | Buffer {
-        if (typeof type_or_length === "number") {
-            const value = this.innerBuffer.subarray(0, type_or_length);
-            this.innerBuffer = this.innerBuffer.subarray(type_or_length);
-            return value;
-        } else {
-            const [value, offset] = type_or_length.read(this.innerBuffer, 0);
-            this.innerBuffer = this.innerBuffer.subarray(offset);
-            return value;
-        }
+export class BufferInputStream extends BaseBufferStream {
+    read(length: number): Buffer {
+        const value = this.innerBuffer.subarray(0, length);
+        this.innerBuffer = this.innerBuffer.subarray(length);
+        return value;
     }
 
-    write<T>(type: DataType<T>, value: T): void;
-    write(buffer: Buffer): void;
-    write<T>(type_or_buffer: DataType<T> | Buffer, value?: T) {
-        if (type_or_buffer instanceof Buffer) {
-            this.innerBuffer = Buffer.concat([this.innerBuffer, type_or_buffer]);
-        } else {
-            this.innerBuffer = Buffer.concat([this.innerBuffer, type_or_buffer.write(value as T)]);
-        }
+    get<T>(type: DataType<T>): T {
+        const [value, offset] = type.read(this.innerBuffer, 0);
+        this.innerBuffer = this.innerBuffer.subarray(offset);
+        return value;
+    }
+}
+
+export class BufferOutputStream extends BaseBufferStream {
+    write(buffer: Buffer) {
+        this.innerBuffer = Buffer.concat([this.innerBuffer, buffer]);
+    }
+
+    put<T>(type: DataType<T>, value: T): void {
+        this.innerBuffer = Buffer.concat([this.innerBuffer, type.write(value)]);
+    }
+}
+
+export class BufferStream extends BaseBufferStream implements BufferInputStream, BufferOutputStream {
+    read(length: number): Buffer {
+        const value = this.innerBuffer.subarray(0, length);
+        this.innerBuffer = this.innerBuffer.subarray(length);
+        return value;
+    }
+
+    get<T>(type: DataType<T>): T {
+        const [value, offset] = type.read(this.innerBuffer, 0);
+        this.innerBuffer = this.innerBuffer.subarray(offset);
+        return value;
+    }
+
+    write(buffer: Buffer) {
+        this.innerBuffer = Buffer.concat([this.innerBuffer, buffer]);
+    }
+
+    put<T>(type: DataType<T>, value: T): void {
+        this.innerBuffer = Buffer.concat([this.innerBuffer, type.write(value)]);
     }
 }

@@ -11,12 +11,12 @@ test("Test the read and write of bufferStream", () => {
     console.time(`BufferStream reads and writes ${length} times`);
 
     for (let i of array) {
-        bs.write(BaseTypes.VarInt32, i);
+        bs.put(BaseTypes.VarInt32, i);
     }
 
     const newArray: number[] = [];
     for (let i = 0; i < length; i++) {
-        newArray.push(bs.read(BaseTypes.VarInt32));
+        newArray.push(bs.get(BaseTypes.VarInt32));
     }
 
     console.timeEnd(`BufferStream reads and writes ${length} times`);
