@@ -33,11 +33,11 @@ type casedPacket = { packetId: number; data: Buffer };
 
 function createCasedPacketBuffer(packetId: number, data: Buffer): Buffer {
     const payloadBS = new BufferStream();
-    payloadBS.write(BaseTypes.VarInt32, packetId);
+    payloadBS.put(BaseTypes.VarInt32, packetId);
     payloadBS.write(data);
 
     const bs = new BufferStream();
-    bs.write(BaseTypes.VarInt32, payloadBS.length);
+    bs.put(BaseTypes.VarInt32, payloadBS.length);
     bs.write(payloadBS.buffer);
 
     return bs.buffer;
@@ -52,7 +52,7 @@ function readCasedPacket(bs: BufferStream): casedPacket | void {
     const payload = bs.read(length);
     const payloadBS = new BufferStream(payload);
 
-    const packetId = payloadBS.read(BaseTypes.VarInt32);
+    const packetId = payloadBS.get(BaseTypes.VarInt32);
     const data = payloadBS.read(payloadBS.length);
     return { packetId, data };
 }
