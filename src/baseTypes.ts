@@ -255,7 +255,7 @@ export namespace BaseTypes {
                 return [result, array_offset];
             },
             (value, item_type, length) => {
-                const result = [];
+                const result: Buffer[] = [];
                 if (value.length != length) throw new FLArrayLengthException(length, value.length);
                 for (let item of value) result.push(item_type.write(item));
                 return Buffer.concat(result);
