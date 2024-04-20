@@ -8,7 +8,7 @@ export class StructBuilder {
         return new this();
     }
 
-    readonly structConf: StructConf = [];
+    readonly structConf: StructConf<any, any> = [];
 
     build<T extends StructData>(): Struct<T> {
         return new Struct(this.structConf);
