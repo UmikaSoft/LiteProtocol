@@ -179,4 +179,16 @@ export class StructBuilder {
         this.row(name, BaseTypes.VarInt64, default_value);
         return this;
     }
+
+    // ZigZag
+
+    rowZigZag32(name: string, default_value?: number) {
+        this.row(name, BaseTypes.ZigZag32, default_value);
+        return this;
+    }
+
+    rowZigZag64(name: string, default_value?: bigint) {
+        this.row(name, BaseTypes.ZigZag64, default_value);
+        return this;
+    }
 }

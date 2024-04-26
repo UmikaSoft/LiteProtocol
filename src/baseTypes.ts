@@ -388,4 +388,69 @@ export namespace BaseTypes {
             return buffer.subarray(0, n + 1);
         },
     );
+
+    // ZigZag
+
+    export const ZigZag32 = defineType<number>(
+        (buffer, offset) => {
+            let value = 0;
+            let bytesRead = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = buffer[offset + bytesRead];
+                if (byte === undefined) throw new BufferOutOfBoundsException();
+                bytesRead++;
+                value |= (byte & 0x7f) << shift;
+                shift += 7;
+                if (shift >= 32) throw new VarIntTooLongException();
+            } while (byte & 0x80);
+            value = (value >> 1) ^ -(value & 1);
+            return [value, bytesRead];
+        },
+        (value) => {
+            value = (value << 1) ^ (value >> 31);
+            const buffer = Buffer.alloc(5);
+            let n = 0;
+            for (; value > 127; n++) {
+                assert(n < 5, new VarIntTooBigException());
+                buffer[n] = (value & 0x7f) | 0x80;
+                value = value >> 7;
+            }
+            buffer[n] = value & 0xff;
+            return buffer.subarray(0, n + 1);
+        },
+    );
+
+    export const ZigZag64 = defineType<bigint>(
+        (buffer, offset) => {
+            let value = 0n;
+            let bytesRead = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = buffer[offset + bytesRead];
+                if (byte === undefined) throw new BufferOutOfBoundsException();
+                bytesRead++;
+                value |= BigInt((byte & 0x7f) << shift);
+                shift += 7;
+                if (shift >= 64) throw new VarIntTooLongException();
+            } while (byte & 0x80);
+            value = (value >> 1n) ^ -(value & 1n);
+            return [value, bytesRead];
+        },
+        (value) => {
+            value = BigInt(value); // 兼容 PString / PArray 长度部分
+            value = (value << 1n) ^ (value >> 63n);
+            const buffer = Buffer.alloc(10);
+            let n = 0;
+            for (; value > 127; n++) {
+                assert(n < 10, new VarIntTooBigException());
+                buffer[n] = Number((value & 0x7fn) | 0x80n);
+                value = value >> 7n;
+            }
+            buffer[n] = Number(value & 0xffn);
+            return buffer.subarray(0, n + 1);
+        },
+    );
 }
