@@ -31,6 +31,12 @@ const config = [
     { name: "row_flstring", type: BaseTypes.FLString(36) },
     { name: "row_pstring", type: BaseTypes.PString(BaseTypes.Int32) },
 
+    { name: "row_varint32", type: BaseTypes.VarInt32 },
+    { name: "row_varint64", type: BaseTypes.VarInt64 },
+
+    { name: "row_zigzag32", type: BaseTypes.ZigZag32 },
+    { name: "row_zigzag64", type: BaseTypes.ZigZag64 },
+
     { name: "row_default_int8", type: BaseTypes.Int8, default: 114 },
     { name: "row_default_uint8", type: BaseTypes.UInt8, default: 114 },
 ];
@@ -62,6 +68,12 @@ type data = {
 
     row_flstring: string;
     row_pstring: string;
+
+    row_varint32: number;
+    row_varint64: bigint;
+
+    row_zigzag32: number;
+    row_zigzag64: bigint;
 
     row_default_int8?: number;
     row_default_uint8?: number;
@@ -95,6 +107,12 @@ function getRandomData(): data {
 
         row_flstring: randomUUID(),
         row_pstring: randomUUID(),
+
+        row_varint32: randomInt(0, 10000),
+        row_varint64: BigInt(randomInt(0, 10000)),
+
+        row_zigzag32: randomInt(-10000, 10000),
+        row_zigzag64: BigInt(randomInt(-10000, 10000)),
     };
 }
 
@@ -111,8 +129,8 @@ test("Test serialization and deserialization of Struct objects", () => {
     for (let [key, value] of Object.entries(newData)) {
         // 逐一对比以防止序列化bigint报错以及float精准度问题
         const fixedValue = (data as any)[key];
-        if (typeof value === "number") expect(value).toBeCloseTo(fixedValue !== undefined ? fixedValue : 114);
-        else expect(value).toEqual(fixedValue !== undefined ? fixedValue : 114);
+        if (typeof value === "number") expect(value).toBeCloseTo(fixedValue ?? 114);
+        else expect(value).toEqual(fixedValue ?? 114);
     }
 });
 
@@ -144,6 +162,12 @@ test("Test StrutBuilder class to build struct objects", () => {
 
         .rowFLString("row_flstring")(36)
         .rowPString("row_pstring")(BaseTypes.Int32)
+
+        .rowVarInt32("row_varint32")
+        .rowVarInt64("row_varint64")
+
+        .rowZigZag32("row_zigzag32")
+        .rowZigZag64("row_zigzag64")
 
         .rowInt8("row_default_int8", 114)
         .rowUInt8("row_default_uint8", 114)

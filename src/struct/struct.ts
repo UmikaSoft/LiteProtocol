@@ -16,7 +16,7 @@ export class Struct<T extends StructData> implements DataType<StructData & T> {
         const result: Buffer[] = [];
         for (let { name, type, default: defaultValue } of this.config) {
             const fixedValue = value[name];
-            result.push(type.write(fixedValue !== undefined ? fixedValue : defaultValue));
+            result.push(type.write(fixedValue ?? defaultValue));
         }
         return Buffer.concat(result);
     }
