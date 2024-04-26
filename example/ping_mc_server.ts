@@ -21,7 +21,7 @@ namespace Packages {
         }>()
         .toPackage();
 
-    export const StatusRequest = StructBuilder.new().build<{}>().toPackage();
+    export const StatusRequest = StructBuilder.new().build().toPackage();
 
     export const StatusResponse = StructBuilder.new()
         .rowPString("json_response")(BaseTypes.VarInt32)
