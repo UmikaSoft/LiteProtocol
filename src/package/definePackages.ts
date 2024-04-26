@@ -3,7 +3,7 @@ import { BasePackage, PackageType } from "./package";
 
 export function definePackage<T extends StructData>(struct: Struct<T>): PackageType<T> {
     return class Package extends BasePackage<T> {
-        static formData(data: T): Package {
+        static formData(data: T = {} as T): Package {
             return new this(data, struct.write(data));
         }
         static fromBuffer(buffer: Buffer, offset: number): Package {

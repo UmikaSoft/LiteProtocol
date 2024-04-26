@@ -116,5 +116,5 @@ const client = createConnection({ host, port }, () => {
     state = State.STATUS;
 
     // 请求服务器状态
-    sendMcPacket(client, 0, Packages.StatusRequest.formData({}));
+    sendMcPacket(client, 0, Packages.StatusRequest.formData());
 });

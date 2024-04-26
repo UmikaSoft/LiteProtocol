@@ -3,7 +3,7 @@ import { StructData } from "../struct/struct";
 
 export interface PackageType<T extends StructData> extends DataType<T> {
     new (data: T, buffer: Buffer): BasePackage<T>;
-    formData(data: T): BasePackage<T>;
+    formData(data?: T): BasePackage<T>;
     fromBuffer(buffer: Buffer, offset: number): BasePackage<T>;
 }
 
