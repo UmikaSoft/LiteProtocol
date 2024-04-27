@@ -242,33 +242,29 @@ export namespace BaseTypes {
 
     // FLArray
 
-    export const FLArray: <T>(item_type: DataType<T>, length: number) => DataType<UniversalArray<T>> =
-        defineTypeGenerator<[DataType<any>, number], UniversalArray<any>>(
-            (buffer, offset, item_type, length) => {
-                const result: any[] = [];
-                let array_offset = 0;
-                for (let i = 0; i < length; i++) {
-                    const [value, item_offset] = item_type.read(buffer, offset + array_offset);
-                    array_offset += item_offset;
-                    result.push(value);
-                }
-                return [result, array_offset];
-            },
-            (value, item_type, length) => {
-                const result: Buffer[] = [];
-                if (value.length != length) throw new FLArrayLengthException(length, value.length);
-                for (let item of value) result.push(item_type.write(item));
-                return Buffer.concat(result);
-            },
-        );
+    export const FLArray = defineTypeGenerator<[item_type: DataType<any>, length: number], UniversalArray<any>>(
+        (buffer, offset, item_type, length) => {
+            const result: any[] = [];
+            let array_offset = 0;
+            for (let i = 0; i < length; i++) {
+                const [value, item_offset] = item_type.read(buffer, offset + array_offset);
+                array_offset += item_offset;
+                result.push(value);
+            }
+            return [result, array_offset];
+        },
+        (value, item_type, length) => {
+            const result: Buffer[] = [];
+            if (value.length != length) throw new FLArrayLengthException(length, value.length);
+            for (let item of value) result.push(item_type.write(item));
+            return Buffer.concat(result);
+        },
+    );
 
     // PArray
 
-    export const PArray: <T>(
-        item_type: DataType<T>,
-        len_type: DataType<number | bigint>,
-    ) => DataType<UniversalArray<T>> = defineTypeGenerator<
-        [DataType<any>, DataType<number | bigint>],
+    export const PArray = defineTypeGenerator<
+        [item_type: DataType<any>, len_type: DataType<number | bigint>],
         UniversalArray<any>
     >(
         (buffer, offset, item_type, len_type) => {
@@ -292,10 +288,7 @@ export namespace BaseTypes {
 
     // FLString
 
-    export const FLString: (length: number, encoding?: BufferEncoding) => DataType<string> = defineTypeGenerator<
-        [number, BufferEncoding?],
-        string
-    >(
+    export const FLString = defineTypeGenerator<[length: number, encoding?: BufferEncoding], string>(
         (buffer, offset, length, encoding) => {
             if (offset + length > buffer.length) throw new BufferOutOfBoundsException();
             return [buffer.subarray(offset, offset + length).toString(encoding), length];
@@ -311,20 +304,22 @@ export namespace BaseTypes {
 
     // PString
 
-    export const PString: (len_type: DataType<number | bigint>, encoding?: BufferEncoding) => DataType<string> =
-        defineTypeGenerator<[DataType<number | bigint>, BufferEncoding?], string>(
-            (buffer, offset, len_type, encoding) => {
-                const [length, len_offset] = len_type.read(buffer, offset);
-                const start = offset + len_offset;
-                const end = start + Number(length);
-                if (end > buffer.length) throw new BufferOutOfBoundsException();
-                return [buffer.subarray(start, end).toString(encoding), len_offset + Number(length)];
-            },
-            (value, len_type, encoding) => {
-                const buffer = Buffer.from(value, encoding);
-                return Buffer.concat([len_type.write(buffer.length), buffer]);
-            },
-        );
+    export const PString = defineTypeGenerator<
+        [len_type: DataType<number | bigint>, encoding?: BufferEncoding],
+        string
+    >(
+        (buffer, offset, len_type, encoding) => {
+            const [length, len_offset] = len_type.read(buffer, offset);
+            const start = offset + len_offset;
+            const end = start + Number(length);
+            if (end > buffer.length) throw new BufferOutOfBoundsException();
+            return [buffer.subarray(start, end).toString(encoding), len_offset + Number(length)];
+        },
+        (value, len_type, encoding) => {
+            const buffer = Buffer.from(value, encoding);
+            return Buffer.concat([len_type.write(buffer.length), buffer]);
+        },
+    );
 
     // VarInt
 
