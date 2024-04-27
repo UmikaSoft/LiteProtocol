@@ -1,7 +1,7 @@
 import { BaseTypes } from "../baseTypes";
 import { DataType } from "../dataType";
 import { TypeGenerator } from "../defineType";
-import { Struct, StructConf, StructData } from "./struct";
+import { ItemCondition, Struct, StructConf, StructData } from "./struct";
 
 export class StructBuilder {
     static new() {
@@ -18,11 +18,29 @@ export class StructBuilder {
         this.structConf.push({ name, type, ...(default_value === undefined ? null : { default: default_value }) });
         return this;
     }
+
     generatorRow<C extends any[], T>(name: string, generator: TypeGenerator<C, T>, default_value?: T) {
         return (...param: C) => {
             this.row(name, generator(...param), default_value);
             return this;
         };
+    }
+
+    setCondition(row_name: string, condition: ItemCondition): this;
+    setCondition(condition: ItemCondition): this;
+    setCondition(...args: [string, ItemCondition] | [ItemCondition]) {
+        if (typeof args[0] === "function") {
+            const [condition] = args;
+            this.structConf[this.structConf.length - 1].condition = condition;
+        } else {
+            const [row_name, condition] = args;
+            for (let [index, row] of this.structConf.entries())
+                if (row.name == row_name) {
+                    this.structConf[index].condition = condition;
+                    break;
+                }
+        }
+        return this;
     }
 
     // Int8
